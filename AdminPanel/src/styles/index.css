@@ -1,0 +1,74 @@
+@import "./theme.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-bg text-text font-body antialiased transition-colors duration-200;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-border bg-surface shadow-soft;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-medium text-sm transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-hover;
+  }
+
+  .btn-outline {
+    @apply btn border border-border bg-surface text-text hover:bg-surface-muted;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger text-white hover:opacity-90;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-text placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-text;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full bg-surface-muted px-2.5 py-1 text-xs font-medium text-text-muted;
+  }
+
+  .table-wrap {
+    @apply w-full overflow-x-auto rounded-xl border border-border;
+  }
+
+  table {
+    @apply w-full text-left text-sm;
+  }
+
+  thead {
+    @apply bg-surface-muted text-xs uppercase tracking-wide text-text-muted;
+  }
+
+  th, td {
+    @apply px-4 py-3;
+  }
+
+  tbody tr {
+    @apply border-t border-border;
+  }
+}

@@ -1,0 +1,45 @@
+/*
+  Same brand tokens as the guest Frontend for visual consistency, isolated in
+  its own file here since AdminPanel is a fully separate app/deployment.
+  Swap brand colors or adjust light/dark mode ONLY here.
+*/
+
+:root {
+  --color-bg: #f7faf9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f4;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+
+  --color-primary: #0f766e;
+  --color-primary-hover: #0d5f58;
+  --color-primary-light: #ccfbf1;
+
+  --color-accent: #f59e0b;
+  --color-accent-hover: #d97f06;
+
+  --color-border: #e2e8f0;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-warning: #d97706;
+}
+
+[data-theme="dark"] {
+  --color-bg: #0b1220;
+  --color-surface: #131c2e;
+  --color-surface-muted: #1a2438;
+  --color-text: #e2e8f0;
+  --color-text-muted: #94a3b8;
+
+  --color-primary: #2dd4bf;
+  --color-primary-hover: #14b8a6;
+  --color-primary-light: #0f2e2c;
+
+  --color-accent: #fbbf24;
+  --color-accent-hover: #f59e0b;
+
+  --color-border: #1e293b;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #fbbf24;
+}
