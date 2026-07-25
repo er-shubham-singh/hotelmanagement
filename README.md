@@ -111,6 +111,19 @@ OVERDUE    → COMPLETED   (only after the penalty is paid)
   the fine is paid.
 - **EXPIRED / NO_SHOW / CANCELLED**: terminal, slot released.
 
+**Late-checkout lifecycle (tightened)**: at `checkOutTime`, a still-`CHECKED_IN`
+booking gets a one-time **"time crossed"** warning ("check out within 30 min to
+avoid a fine") via `checkoutReminder.job.js`; if it's still not checked out
+`GRACE` minutes later, `overduePenalty.job.js` flips it to `OVERDUE` and starts
+accruing `penaltyAmount` (throttled re-notify only when the amount actually
+increases). **Checkout is gated server-side** the entire time — both the guest
+self-checkout endpoint and the AdminPanel code-verified checkout
+(`checkin.service.js#performCheckOut`) refuse to complete an `OVERDUE` booking
+until the fine is paid via `POST /payments/fine/:bookingId`; only that success
+path can move `OVERDUE → COMPLETED`. Every penalty tick also emits a
+`booking:penaltyUpdate` socket event so an open "Pay Fine" panel (Frontend) or
+the AdminPanel bookings table shows the live amount without a reload.
+
 **Real availability**: `Backend/src/services/availability.service.js`
 computes "X of Y available" live by counting overlapping bookings in
 holding states for a room — nothing is double-booked, and capacity is
@@ -154,6 +167,17 @@ keys to go live with the actual Checkout widget and Payment Links/QR codes.
 - **Firebase push** is optional — leave `FIREBASE_SERVICE_ACCOUNT_JSON`
   (backend) and `VITE_FIREBASE_*` (frontend) blank to disable browser push;
   in-app + realtime notifications work regardless.
+- **Notification permission** is asked for via a dismissible **"Enable
+  reminders"** banner (`Frontend/src/components/NotificationPermissionBanner.jsx`)
+  rather than firing the browser permission prompt automatically on every
+  login — it shows once (persisted in `localStorage`) and only when Firebase
+  push is actually configured and permission hasn't been granted/denied yet.
+- **Pre-stay reminders**: `checkinReminder.job.js` notifies a guest
+  `CHECKIN_REMINDER_MINUTES` (default 30) before their check-in window opens;
+  `checkoutReminder.job.js` does the same before checkout, plus the "time
+  crossed" overdue warning described above. All guarded by a one-time flag
+  on the booking (`checkinReminderSent` / `checkoutReminderSent` /
+  `timeCrossedNotified`) so they never repeat.
 
 ## Other Part 2 features
 

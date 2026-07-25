@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { KeyRound, XCircle, IndianRupee, RefreshCw } from "lucide-react";
+import { KeyRound, XCircle, IndianRupee, RefreshCw, AlertTriangle } from "lucide-react";
 import Loader from "../common/Loader.jsx";
 import EmptyState from "../common/EmptyState.jsx";
 import Badge from "../common/Badge.jsx";
@@ -9,6 +9,7 @@ import Select from "../common/Select.jsx";
 import Modal from "../common/Modal.jsx";
 import Input from "../common/Input.jsx";
 import Button from "../common/Button.jsx";
+import { useSocketEvent } from "../hooks/useSocket.js";
 import {
   listAllBookings,
   cancelBooking,
@@ -48,6 +49,21 @@ const Bookings = () => {
   });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
+
+  // Keep the table (status + accruing penalty) live without a manual reload —
+  // cron transitions and guest-side payments all flow through here too.
+  useSocketEvent("booking:statusUpdate", () => refresh(), []);
+  useSocketEvent(
+    "booking:penaltyUpdate",
+    (payload) => {
+      queryClient.setQueriesData({ queryKey: ["admin-bookings"] }, (data) =>
+        data
+          ? { ...data, bookings: data.bookings.map((b) => (b._id === payload.bookingId ? { ...b, penaltyAmount: payload.penaltyAmount } : b)) }
+          : data
+      );
+    },
+    []
+  );
 
   const handleCancel = async (id) => {
     if (!confirm("Cancel this booking? This will process a refund per policy.")) return;
@@ -166,7 +182,7 @@ const Bookings = () => {
                           <KeyRound className="h-3.5 w-3.5" /> Check-in
                         </button>
                       )}
-                      {["CHECKED_IN", "OVERDUE"].includes(booking.status) && (
+                      {booking.status === "CHECKED_IN" && (
                         <button
                           onClick={() => openCodeModal(booking, "checkout")}
                           title="Verify check-out code"
@@ -174,6 +190,14 @@ const Bookings = () => {
                         >
                           <KeyRound className="h-3.5 w-3.5" /> Check-out
                         </button>
+                      )}
+                      {booking.status === "OVERDUE" && (
+                        <span
+                          title={`Guest must pay the ₹${booking.penaltyAmount} overdue fine before checkout can complete — this happens automatically the moment they pay.`}
+                          className="flex cursor-not-allowed items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-danger"
+                        >
+                          <AlertTriangle className="h-3.5 w-3.5" /> Fine unpaid
+                        </span>
                       )}
                       {["ACCEPTED", "CONFIRMED", "ACTIVE"].includes(booking.status) && (
                         <button onClick={() => handleCancel(booking._id)} title="Cancel" className="rounded-lg p-1.5 text-danger hover:bg-surface-muted">

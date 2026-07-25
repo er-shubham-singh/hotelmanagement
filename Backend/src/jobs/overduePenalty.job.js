@@ -4,6 +4,16 @@ import { BOOKING_STATUS, PAYMENT_STATUS, CHECKOUT_GRACE_MINUTES, NOTIFICATION_TY
 import { calculatePenalty } from "../services/pricing.service.js";
 import { transition } from "../services/bookingStatus.service.js";
 import { sendNotification } from "../notifications/notification.service.js";
+import { emitToUser, emitToBooking } from "../services/realtime.service.js";
+
+// Lets any open "pay the fine" screen (frontend PaymentPanel/MyBookings, or
+// an anonymous QR-payer watching the booking room) update the displayed
+// amount live, without waiting for a full booking:statusUpdate refetch.
+const emitPenaltyUpdate = (booking) => {
+  const payload = { bookingId: booking._id, penaltyAmount: booking.penaltyAmount };
+  emitToUser(booking.user, "booking:penaltyUpdate", payload);
+  emitToBooking(booking._id, "booking:penaltyUpdate", payload);
+};
 
 // Every ~5 min: flips CHECKED_IN bookings that are past checkout + grace
 // into OVERDUE and starts/continues accruing a penalty. Also keeps
@@ -23,6 +33,7 @@ export const runOverduePenaltyJob = async () => {
     const penalty = calculatePenalty(booking, now.toDate());
     booking.penaltyAmount = penalty;
     booking.penaltyAccruedUntil = now.toDate();
+    booking.penaltyStartedAt = now.toDate();
     booking.paymentStatus = PAYMENT_STATUS.FINE_PENDING;
     await booking.save();
     await transition(booking, BOOKING_STATUS.OVERDUE, {
@@ -33,6 +44,7 @@ export const runOverduePenaltyJob = async () => {
         type: NOTIFICATION_TYPES.OVERDUE_PENALTY,
       },
     });
+    emitPenaltyUpdate(booking);
     flipped += 1;
   }
 
@@ -51,6 +63,7 @@ export const runOverduePenaltyJob = async () => {
         body: `Booking ${booking.bookingRef} penalty is now ₹${penalty} — please check out and pay to stop further accrual.`,
         data: { bookingId: String(booking._id), bookingRef: booking.bookingRef },
       });
+      emitPenaltyUpdate(booking);
       reaccrued += 1;
     }
   }

@@ -39,6 +39,7 @@ export const performCheckOut = async (booking, { reason = "Checked out" } = {}) 
       const penalty = calculatePenalty(booking, now);
       booking.penaltyAmount = penalty;
       booking.penaltyAccruedUntil = now;
+      booking.penaltyStartedAt = booking.penaltyStartedAt || now;
       booking.paymentStatus = PAYMENT_STATUS.FINE_PENDING;
       await booking.save();
       await bookingStatusService.transition(booking, BOOKING_STATUS.OVERDUE, { reason: "Checkout grace period elapsed" });

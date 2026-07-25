@@ -48,6 +48,7 @@ export const runSlotCleanupJob = async () => {
     const penalty = calculatePenalty(booking, now);
     booking.penaltyAmount = penalty;
     booking.penaltyAccruedUntil = now;
+    booking.penaltyStartedAt = booking.penaltyStartedAt || now;
     booking.paymentStatus = PAYMENT_STATUS.FINE_PENDING;
     await booking.save();
     await transition(booking, BOOKING_STATUS.OVERDUE, { reason: "Reconciliation: overdue not yet flagged" });

@@ -43,6 +43,7 @@ export const config = {
   cron: {
     holdExpiry: process.env.CRON_HOLD_EXPIRY || "*/1 * * * *",
     activateBookings: process.env.CRON_ACTIVATE_BOOKINGS || "*/1 * * * *",
+    checkinReminder: process.env.CRON_CHECKIN_REMINDER || "*/1 * * * *",
     checkoutReminder: process.env.CRON_CHECKOUT_REMINDER || "*/1 * * * *",
     overduePenalty: process.env.CRON_OVERDUE_PENALTY || "*/5 * * * *",
     noShow: process.env.CRON_NO_SHOW || "*/5 * * * *",

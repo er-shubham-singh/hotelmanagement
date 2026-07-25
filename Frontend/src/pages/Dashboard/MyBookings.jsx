@@ -69,6 +69,21 @@ const MyBookings = () => {
     []
   );
 
+  // Overdue fine accrues on a cron tick — this keeps the penalty amount (both
+  // the list badge and an open "Pay Fine" modal) live without a full refetch.
+  useSocketEvent(
+    "booking:penaltyUpdate",
+    (payload) => {
+      queryClient.setQueriesData({ queryKey: ["my-bookings"] }, (bookings) =>
+        bookings?.map((b) => (b._id === payload.bookingId ? { ...b, penaltyAmount: payload.penaltyAmount } : b))
+      );
+      setPayModal((pm) =>
+        pm && pm.booking._id === payload.bookingId ? { ...pm, booking: { ...pm.booking, penaltyAmount: payload.penaltyAmount } } : pm
+      );
+    },
+    []
+  );
+
   const handleCancel = async (id) => {
     try {
       await cancelBooking(id, "Cancelled by user from dashboard");

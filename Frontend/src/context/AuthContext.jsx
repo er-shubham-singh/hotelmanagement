@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import * as authApi from "../api/auth.api.js";
 import { setAccessToken, setUnauthorizedHandler } from "../api/axiosClient.js";
-import { initPushNotifications, signInWithGoogle } from "../firebase/firebaseClient.js";
+import { signInWithGoogle } from "../firebase/firebaseClient.js";
 
 const AuthContext = createContext(null);
 
@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
         setAccessToken(refreshData.data.accessToken);
         const { data: meData } = await authApi.getMe();
         setUser(meData.data.user);
-        initPushNotifications().catch(() => null);
       } catch (error) {
         clearSession();
       } finally {
@@ -39,7 +38,6 @@ export const AuthProvider = ({ children }) => {
   const applySession = (payload) => {
     setAccessToken(payload.accessToken);
     setUser(payload.user);
-    initPushNotifications().catch(() => null);
   };
 
   const loginWithPassword = async (identifier, password) => {

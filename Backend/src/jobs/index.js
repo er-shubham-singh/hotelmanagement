@@ -2,6 +2,7 @@ import cron from "node-cron";
 import { config } from "../config/env.js";
 import { runHoldExpiryJob } from "./holdExpiry.job.js";
 import { runActivateBookingsJob } from "./activateBookings.job.js";
+import { runCheckinReminderJob } from "./checkinReminder.job.js";
 import { runCheckoutReminderJob } from "./checkoutReminder.job.js";
 import { runOverduePenaltyJob } from "./overduePenalty.job.js";
 import { runNoShowJob } from "./noShow.job.js";
@@ -10,6 +11,7 @@ import { runSlotCleanupJob } from "./slotCleanup.job.js";
 const JOBS = [
   { name: "holdExpiry", schedule: config.cron.holdExpiry, run: runHoldExpiryJob },
   { name: "activateBookings", schedule: config.cron.activateBookings, run: runActivateBookingsJob },
+  { name: "checkinReminder", schedule: config.cron.checkinReminder, run: runCheckinReminderJob },
   { name: "checkoutReminder", schedule: config.cron.checkoutReminder, run: runCheckoutReminderJob },
   { name: "overduePenalty", schedule: config.cron.overduePenalty, run: runOverduePenaltyJob },
   { name: "noShow", schedule: config.cron.noShow, run: runNoShowJob },

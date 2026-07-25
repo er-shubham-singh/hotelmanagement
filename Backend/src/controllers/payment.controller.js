@@ -176,6 +176,7 @@ export const verifyFinePayment = asyncHandler(async (req, res) => {
 
 const completeFinePayment = async (booking) => {
   booking.paymentStatus = PAYMENT_STATUS.FINE_PAID;
+  booking.finePaidAt = new Date();
   booking.checkedOutAt = booking.checkedOutAt || new Date();
   await booking.save();
 

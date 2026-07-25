@@ -57,7 +57,11 @@ const bookingSchema = new mongoose.Schema(
     // Check-in / check-out tracking
     checkedInAt: { type: Date, default: null },
     checkedOutAt: { type: Date, default: null },
+    checkinReminderSent: { type: Boolean, default: false },
     checkoutReminderSent: { type: Boolean, default: false },
+    // Set once when checkout time passes but the guest is still CHECKED_IN —
+    // the "time crossed, pay within the grace period" warning fires once.
+    timeCrossedNotified: { type: Boolean, default: false },
     checkinVerifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     checkoutVerifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
@@ -79,6 +83,8 @@ const bookingSchema = new mongoose.Schema(
     // Overdue penalty
     penaltyAmount: { type: Number, default: 0 },
     penaltyAccruedUntil: { type: Date, default: null },
+    penaltyStartedAt: { type: Date, default: null },
+    finePaidAt: { type: Date, default: null },
 
     // Razorpay
     razorpayOrderId: { type: String, default: null },
