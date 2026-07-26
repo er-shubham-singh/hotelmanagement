@@ -76,7 +76,7 @@ const MobileDrawer = ({ isOpen, onClose, navLinks, isAuthenticated, user, theme,
         aria-modal="true"
         aria-label="Navigation menu"
         aria-hidden={!isOpen}
-        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-[85%] max-w-xs flex-col bg-surface shadow-soft-lg transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 flex h-dvh w-[85%] max-w-xs flex-col bg-surface shadow-soft-lg transition-transform duration-300 ease-in-out md:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
