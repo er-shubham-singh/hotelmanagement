@@ -1,5 +1,5 @@
 const Privacy = () => (
-  <div className="container-app max-w-3xl py-14">
+  <div className="container-app max-w-3xl py-8 sm:py-14">
     <h1 className="font-heading text-3xl font-bold text-text">Privacy Policy</h1>
     <div className="mt-6 space-y-4 text-text-muted">
       <p>

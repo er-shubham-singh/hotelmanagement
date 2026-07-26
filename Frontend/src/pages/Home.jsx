@@ -11,9 +11,9 @@ import { CITY_CHIPS } from "../utils/constants.js";
 import { Link } from "react-router-dom";
 
 const Section = ({ title, subtitle, children, className = "" }) => (
-  <section className={`container-app py-14 ${className}`}>
+  <section className={`container-app py-8 sm:py-14 ${className}`}>
     {title && (
-      <div className="mb-8 text-center">
+      <div className="mb-5 text-center sm:mb-8">
         <h2 className="font-heading text-2xl font-bold text-text sm:text-3xl">{title}</h2>
         {subtitle && <p className="mt-2 text-text-muted">{subtitle}</p>}
       </div>
