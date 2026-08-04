@@ -31,11 +31,11 @@ const StatItem = ({ stat, isVisible }) => {
   const display = useCountUp(stat.value, isVisible, stat.decimals);
   return (
     <div className="text-center">
-      <p className="font-heading text-3xl font-bold text-primary sm:text-4xl">
+      <p className="font-heading text-xl font-bold text-primary sm:text-3xl lg:text-4xl">
         {display}
         {stat.suffix}
       </p>
-      <p className="mt-1 text-sm text-text-muted">{stat.label}</p>
+      <p className="mt-1 text-xs text-text-muted sm:text-sm">{stat.label}</p>
     </div>
   );
 };
@@ -53,7 +53,7 @@ const StatsCounter = () => {
   }, []);
 
   return (
-    <div ref={ref} className="grid grid-cols-2 gap-6 rounded-2xl bg-surface-muted p-8 sm:grid-cols-4">
+    <div ref={ref} className="grid grid-cols-2 gap-x-3 gap-y-5 rounded-2xl bg-surface-muted p-5 sm:gap-6 sm:p-8 sm:grid-cols-4">
       {STATS.map((stat) => (
         <StatItem key={stat.label} stat={stat} isVisible={isVisible} />
       ))}

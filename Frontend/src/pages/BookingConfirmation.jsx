@@ -19,7 +19,7 @@ const BookingConfirmation = () => {
   if (!data) return <EmptyState title="Booking not found" />;
 
   return (
-    <div className="container-app flex justify-center py-12">
+    <div className="container-app flex justify-center py-8">
       <div className="w-full max-w-xl">
         <div className="card p-6 text-center sm:p-8">
           <CheckCircle2 className="mx-auto h-14 w-14 text-success" />

@@ -19,7 +19,7 @@ const Partner = () => {
   };
 
   return (
-    <div className="container-app py-12">
+    <div className="container-app py-8">
       <div className="mx-auto max-w-lg text-center">
         <Building2 className="mx-auto h-10 w-10 text-primary" />
         <h1 className="mt-3 font-heading text-2xl font-bold text-text sm:text-3xl">List Your Hotel</h1>

@@ -19,7 +19,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="container-app py-12">
+    <div className="container-app py-8">
       <div className="mb-10 text-center">
         <h1 className="font-heading text-2xl font-bold text-text sm:text-3xl">Get in Touch</h1>
         <p className="mt-2 text-text-muted">We usually respond within one business day.</p>

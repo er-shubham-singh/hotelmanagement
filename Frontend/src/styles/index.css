@@ -54,7 +54,7 @@
   }
 
   .btn-accent {
-    @apply btn bg-accent text-white hover:bg-accent-hover;
+    @apply btn bg-secondary text-white hover:bg-secondary-hover;
   }
 
   .btn-outline {

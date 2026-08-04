@@ -1,13 +1,14 @@
-// Shared HTML shell for all outgoing email — on-brand (teal/amber), responsive,
+// Shared HTML shell for all outgoing email — on-brand (deep green/gold), responsive,
 // table-based layout for maximum email-client compatibility.
 const BRAND = {
-  primary: "#0f766e",
-  primaryDark: "#0d5f58",
-  accent: "#f59e0b",
-  text: "#0f172a",
-  muted: "#64748b",
-  border: "#e2e8f0",
-  bg: "#f7faf9",
+  primary: "#1b4332",
+  primaryDark: "#123526",
+  accent: "#f0b429",
+  secondary: "#7a2331",
+  text: "#17261e",
+  muted: "#5c6b60",
+  border: "#e4dcc4",
+  bg: "#f6f2e7",
 };
 
 export const wrapEmail = ({ title, preheader = "", bodyHtml, ctaLabel, ctaUrl }) => `
@@ -70,7 +71,7 @@ export const wrapEmail = ({ title, preheader = "", bodyHtml, ctaLabel, ctaUrl })
 export const codeBlock = (code) => `
   <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
     <tr>
-      <td style="background:#f1f5f4; border: 1px dashed #cbd5e1; border-radius:12px; padding: 16px 24px;">
+      <td style="background:#efe6d1; border: 1px dashed #d8cca4; border-radius:12px; padding: 16px 24px;">
         <span style="font-size:28px; font-weight:700; letter-spacing:6px; color:${BRAND.text}; font-family: monospace;">${code}</span>
       </td>
     </tr>

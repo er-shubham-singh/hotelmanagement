@@ -25,8 +25,8 @@ const columns = [
 ];
 
 const Footer = () => (
-  <footer className="mt-20 border-t border-border bg-surface">
-    <div className="container-app grid gap-10 py-14 md:grid-cols-[2fr_1fr_1fr_1.5fr]">
+  <footer className="mt-12 border-t border-border bg-surface">
+    <div className="container-app grid gap-10 py-10 md:grid-cols-[2fr_1fr_1fr_1.5fr]">
       <div>
         <Link to="/" className="mb-4 flex items-center gap-2 font-heading text-xl font-bold text-text">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white">

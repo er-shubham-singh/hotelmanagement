@@ -77,7 +77,7 @@ const PaymentPanel = ({ bookingId, bookingRef, amount, guest, mode = "booking", 
         name: "StayByHour",
         description: mode === "fine" ? `Overdue fine — ${bookingRef}` : `Booking ${bookingRef}`,
         prefill: { name: guest?.name || user?.name, contact: guest?.phone || user?.phone, email: user?.email },
-        theme: { color: "#0f766e" },
+        theme: { color: "#1b4332" },
         handler: async (response) => {
           try {
             await orderFns.verify({

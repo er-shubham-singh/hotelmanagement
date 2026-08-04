@@ -118,7 +118,7 @@ const Login = () => {
   };
 
   return (
-    <div className="container-app flex min-h-[75vh] items-center justify-center py-12">
+    <div className="container-app flex min-h-[75vh] items-center justify-center py-8">
       <div className="w-full max-w-md">
         <div className="card p-6 sm:p-8">
           <h1 className="text-center font-heading text-2xl font-bold text-text">Login or Sign up</h1>

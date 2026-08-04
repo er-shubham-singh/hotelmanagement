@@ -12,7 +12,7 @@ export const thankYouEmail = ({ name, bookingRef, hotelName, hotelSlug }) => {
         Your feedback helps other travelers — got two minutes to share how it went?
       </p>
       <p style="margin:0 0 12px; color:#334155; font-size:14px; line-height:1.6;">
-        As a thank-you, here's <strong>10% off (code <span style="color:#0f766e; font-weight:700;">WELCOME10</span>)</strong> your next hourly stay.
+        As a thank-you, here's <strong>10% off (code <span style="color:#1b4332; font-weight:700;">WELCOME10</span>)</strong> your next hourly stay.
       </p>
       <p style="margin:0; color:#94a3b8; font-size:12px;">
         Questions about this stay? Just reply to this email — we're happy to help.

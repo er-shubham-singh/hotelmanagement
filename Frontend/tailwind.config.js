@@ -19,6 +19,10 @@ export default {
           DEFAULT: "var(--color-accent)",
           hover: "var(--color-accent-hover)",
         },
+        secondary: {
+          DEFAULT: "var(--color-secondary)",
+          hover: "var(--color-secondary-hover)",
+        },
         border: "var(--color-border)",
         success: "var(--color-success)",
         danger: "var(--color-danger)",
