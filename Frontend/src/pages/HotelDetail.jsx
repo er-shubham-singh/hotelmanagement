@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { MapPin, Wifi, Snowflake, Tv, Droplets, Coffee, Car, Bell, Users, Heart } from "lucide-react";
+import { MapPin, Wifi, Snowflake, Tv, Droplets, Coffee, Car, Bell, Users, Heart, Clock3 } from "lucide-react";
 import Loader from "../common/Loader.jsx";
 import EmptyState from "../common/EmptyState.jsx";
 import Button from "../common/Button.jsx";
@@ -195,7 +195,12 @@ const HotelDetail = () => {
 
         <div>
           <div className="card sticky top-24 space-y-4 p-5">
-            <h3 className="font-heading text-base font-semibold text-text">Select your slot</h3>
+            <div className="flex items-center gap-2">
+              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary">
+                <Clock3 className="h-4 w-4" />
+              </span>
+              <h3 className="font-heading text-base font-semibold text-text">Select your slot</h3>
+            </div>
 
             <Input type="date" label="Date" min={todayStr()} value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} />
             <Input type="time" label="Check-in Time" value={checkInTime} onChange={(e) => setCheckInTime(e.target.value)} />

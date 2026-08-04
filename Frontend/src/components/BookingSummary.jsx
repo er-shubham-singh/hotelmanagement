@@ -8,13 +8,21 @@ const Row = ({ label, value, muted = false, strong = false }) => (
 );
 
 const BookingSummary = ({ hotel, room, checkInDate, checkInTime, durationHrs, pricing }) => (
-  <div className="card sticky top-24 p-5">
+  <div className="card sticky top-24 overflow-hidden p-5">
     <h3 className="font-heading text-base font-semibold text-text">Booking Summary</h3>
 
     {hotel && (
-      <div className="mt-3 border-b border-border pb-3">
-        <p className="font-medium text-text">{hotel.name}</p>
-        <p className="text-sm text-text-muted">{room?.type}</p>
+      <div className="mt-3 flex items-center gap-3 border-b border-border pb-3">
+        <img
+          src={hotel.images?.[0] || `https://picsum.photos/seed/staybyhour-hotel-${hotel.slug}/120/120`}
+          alt=""
+          aria-hidden="true"
+          className="h-14 w-14 flex-shrink-0 rounded-xl object-cover"
+        />
+        <div>
+          <p className="font-medium text-text">{hotel.name}</p>
+          <p className="text-sm text-text-muted">{room?.type}</p>
+        </div>
       </div>
     )}
 

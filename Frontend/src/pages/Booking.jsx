@@ -147,9 +147,24 @@ const Booking = () => {
   }
 
   return (
-    <div className="container-app py-8">
-      <h1 className="mb-6 font-heading text-2xl font-bold text-text">Complete Your Booking</h1>
+    <div>
+      <section className="relative overflow-hidden py-8 sm:py-10">
+        <img
+          src={hotel?.images?.[0] || `https://picsum.photos/seed/staybyhour-hotel-${hotelSlug}/1600/400`}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-hover/85 via-primary-hover/65 to-bg backdrop-blur-sm" />
+        <div className="container-app relative">
+          <div className="mx-auto max-w-xl rounded-2xl bg-primary-hover/25 px-5 py-4 text-center backdrop-blur-md sm:px-8 sm:py-5">
+            <h1 className="font-heading text-2xl font-bold text-white">Complete Your Booking</h1>
+            {hotel && <p className="mt-1 text-white/90">{hotel.name}</p>}
+          </div>
+        </div>
+      </section>
 
+      <div className="container-app py-8">
       <div className="grid gap-8 lg:grid-cols-3">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 lg:col-span-2">
           <div className="card p-5">
@@ -212,6 +227,7 @@ const Booking = () => {
             pricing={pricing}
           />
         </div>
+      </div>
       </div>
     </div>
   );

@@ -60,12 +60,24 @@ const SearchResults = () => {
   const cityLabel = citySlug ? citySlug.charAt(0).toUpperCase() + citySlug.slice(1) : "your city";
 
   return (
-    <div className="container-app py-8">
-      <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-text sm:text-3xl">Hourly Hotels in {cityLabel}</h1>
-        <p className="mt-1 text-text-muted">{data?.total ?? 0} properties found</p>
-      </div>
+    <div>
+      <section className="relative overflow-hidden py-10 sm:py-12">
+        <img
+          src={`https://picsum.photos/seed/staybyhour-city-${citySlug}/1600/500`}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-hover/80 via-primary-hover/60 to-bg backdrop-blur-sm" />
+        <div className="container-app relative">
+          <div className="mx-auto max-w-2xl rounded-2xl bg-primary-hover/25 px-5 py-5 text-center backdrop-blur-md sm:px-8 sm:py-6">
+            <h1 className="font-heading text-2xl font-bold text-white sm:text-3xl">Hourly Hotels in {cityLabel}</h1>
+            <p className="mt-1 text-white/90">{data?.total ?? 0} properties found</p>
+          </div>
+        </div>
+      </section>
 
+      <div className="container-app py-6">
       <div className="mb-6 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text-muted">
         <SlidersHorizontal className="h-4 w-4" />
         Standard amenities across our partner hotels:
@@ -113,6 +125,7 @@ const SearchResults = () => {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
