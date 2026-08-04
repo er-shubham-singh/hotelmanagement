@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import mongoose from "mongoose";
 import { City } from "../models/city.model.js";
 import { Hotel } from "../models/hotel.model.js";
@@ -9,6 +12,10 @@ import { ROLES } from "../config/constants.js";
 import { getSlotBasePrice } from "../services/pricing.service.js";
 import { computeStayWindow, getAvailableUnits } from "../services/availability.service.js";
 import { logAudit } from "../services/audit.service.js";
+import { isCloudinaryConfigured, uploadBufferToCloudinary } from "../config/cloudinary.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadsRoot = path.join(__dirname, "..", "..", "uploads", "hotels");
 
 const assertOwnerOrAdmin = (hotel, user) => {
   if (user.role === ROLES.ADMIN) return;
@@ -204,7 +211,9 @@ export const deleteHotel = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "Hotel deactivated"));
 });
 
-// POST /hotels/:id/images (multer, admin | owner)
+// POST /hotels/:id/images (multer, admin | owner) — uploads to Cloudinary when
+// CLOUDINARY_* env vars are set, otherwise falls back to local disk storage
+// under uploads/hotels (same graceful-degradation pattern as Razorpay/Firebase).
 export const uploadHotelImages = asyncHandler(async (req, res) => {
   const hotel = await Hotel.findById(req.params.id);
   if (!hotel) throw new ApiError(404, "Hotel not found");
@@ -213,7 +222,23 @@ export const uploadHotelImages = asyncHandler(async (req, res) => {
   const files = req.files || [];
   if (!files.length) throw new ApiError(400, "No images uploaded");
 
-  const urls = files.map((f) => `/uploads/hotels/${f.filename}`);
+  let urls;
+  if (isCloudinaryConfigured) {
+    const results = await Promise.all(
+      files.map((f) => uploadBufferToCloudinary(f.buffer, `staybyhour/hotels/${hotel.slug}`))
+    );
+    urls = results.map((r) => r.secure_url);
+  } else {
+    fs.mkdirSync(uploadsRoot, { recursive: true });
+    urls = files.map((f) => {
+      const ext = path.extname(f.originalname) || ".jpg";
+      const base = path.basename(f.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, "-");
+      const filename = `${base}-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
+      fs.writeFileSync(path.join(uploadsRoot, filename), f.buffer);
+      return `/uploads/hotels/${filename}`;
+    });
+  }
+
   hotel.images.push(...urls);
   await hotel.save();
 

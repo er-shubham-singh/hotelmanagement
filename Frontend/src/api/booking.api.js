@@ -6,6 +6,8 @@ export const getMyBookings = (status) => axiosClient.get("/bookings/my", { param
 
 export const getBookingByRef = (ref) => axiosClient.get(`/bookings/${ref}`);
 
+export const getBookingById = (id) => axiosClient.get(`/bookings/id/${id}`);
+
 export const cancelBooking = (id, reason) => axiosClient.patch(`/bookings/${id}/cancel`, { reason });
 
 export const rescheduleBooking = (id, payload) => axiosClient.patch(`/bookings/${id}/reschedule`, payload);

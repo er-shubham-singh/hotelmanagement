@@ -29,6 +29,35 @@ export const getHotelReviews = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { reviews }, "Reviews fetched"));
 });
 
+// GET /reviews/my (auth) — every review this user has written, with the
+// hotel's basic info attached so the dashboard/review-prompt can show it
+// without a second lookup.
+export const getMyReviews = asyncHandler(async (req, res) => {
+  const reviews = await Review.find({ user: req.user._id })
+    .populate("hotel", "name slug images")
+    .sort({ createdAt: -1 });
+
+  res.status(200).json(new ApiResponse(200, { reviews }, "Your reviews fetched"));
+});
+
+// PATCH /reviews/:id (auth, owner only) — edit an existing review.
+export const updateReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
+  const review = await Review.findById(req.params.id);
+  if (!review) throw new ApiError(404, "Review not found");
+  if (review.user.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You can only edit your own review");
+  }
+
+  if (rating !== undefined) review.rating = rating;
+  if (comment !== undefined) review.comment = comment;
+  await review.save();
+
+  await recalculateHotelRating(review.hotel);
+
+  res.status(200).json(new ApiResponse(200, { review }, "Review updated"));
+});
+
 // POST /reviews (auth) — only guests with a COMPLETED stay at this hotel may review it.
 export const createReview = asyncHandler(async (req, res) => {
   const { hotelId, rating, comment, bookingId } = req.body;
@@ -60,4 +89,4 @@ export const createReview = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, { review }, "Review submitted"));
 });
 
-export default { getHotelReviews, createReview };
+export default { getHotelReviews, createReview, getMyReviews, updateReview };

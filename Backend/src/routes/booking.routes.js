@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createBooking,
   getMyBookings,
+  getBookingById,
   getBookingByRef,
   cancelBooking,
   rescheduleBooking,
@@ -18,6 +19,7 @@ const router = Router();
 router.post("/", authenticate, createBooking);
 router.get("/my", authenticate, getMyBookings);
 router.get("/admin/all", authenticate, requireRole(ROLES.ADMIN, ROLES.HOTEL_OWNER), listAllBookings);
+router.get("/id/:id", authenticate, getBookingById);
 router.get("/:ref", authenticate, getBookingByRef);
 router.patch("/:id/cancel", authenticate, cancelBooking);
 router.patch("/:id/reschedule", authenticate, rescheduleBooking);

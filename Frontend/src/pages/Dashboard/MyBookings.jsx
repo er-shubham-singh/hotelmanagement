@@ -11,7 +11,9 @@ import Modal from "../../common/Modal.jsx";
 import Input from "../../common/Input.jsx";
 import Select from "../../common/Select.jsx";
 import PaymentPanel from "../../components/PaymentPanel.jsx";
+import ReviewModal from "../../components/ReviewModal.jsx";
 import { getMyBookings, cancelBooking, rescheduleBooking } from "../../api/booking.api.js";
+import { getMyReviews } from "../../api/review.api.js";
 import { formatCurrency, formatDate, formatTime, durationLabel } from "../../utils/formatters.js";
 import { env } from "../../config/env.js";
 import { DURATION_OPTIONS } from "../../utils/constants.js";
@@ -43,6 +45,7 @@ const MyBookings = () => {
   const [payModal, setPayModal] = useState(null); // { booking, mode }
   const [rescheduleModal, setRescheduleModal] = useState(null);
   const [rescheduleForm, setRescheduleForm] = useState({ checkInDate: "", checkInTime: "", durationHrs: 6 });
+  const [reviewModal, setReviewModal] = useState(null); // { hotel, bookingId, existingReview }
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -53,7 +56,19 @@ const MyBookings = () => {
     refetchInterval: 60 * 1000,
   });
 
+  // Shares the "my-reviews" cache key with the global post-checkout ReviewPrompt.
+  const { data: myReviews } = useQuery({
+    queryKey: ["my-reviews"],
+    queryFn: async () => (await getMyReviews()).data.data.reviews,
+  });
+
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+  const refreshReviews = () => queryClient.invalidateQueries({ queryKey: ["my-reviews"] });
+
+  const openReview = (booking) => {
+    const existingReview = myReviews?.find((r) => r.hotel?._id === booking.hotel?._id);
+    setReviewModal({ hotel: booking.hotel, bookingId: booking._id, existingReview });
+  };
 
   // The backend emits this the instant a booking's status changes — whether
   // triggered by a cron job (e.g. the check-in window opening), a payment,
@@ -213,11 +228,28 @@ const MyBookings = () => {
                         </Button>
                       </a>
                     )}
-                    <Link to={`/hotels/${booking.hotel?.slug}`}>
-                      <Button variant="outline">
-                        <Star className="h-4 w-4" /> Write a Review
-                      </Button>
-                    </Link>
+                    {(() => {
+                      const existingReview = myReviews?.find((r) => r.hotel?._id === booking.hotel?._id);
+                      return existingReview ? (
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1 text-sm text-text-muted">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`h-4 w-4 ${star <= existingReview.rating ? "fill-accent text-accent" : "fill-transparent text-border"}`}
+                              />
+                            ))}
+                          </span>
+                          <Button variant="outline" onClick={() => openReview(booking)}>
+                            Edit Review
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button variant="outline" onClick={() => openReview(booking)}>
+                          <Star className="h-4 w-4" /> Write a Review
+                        </Button>
+                      );
+                    })()}
                   </>
                 )}
               </div>
@@ -276,6 +308,15 @@ const MyBookings = () => {
           </div>
         )}
       </Modal>
+
+      <ReviewModal
+        isOpen={!!reviewModal}
+        onClose={() => setReviewModal(null)}
+        hotel={reviewModal?.hotel}
+        bookingId={reviewModal?.bookingId}
+        existingReview={reviewModal?.existingReview}
+        onSubmitted={refreshReviews}
+      />
     </div>
   );
 };

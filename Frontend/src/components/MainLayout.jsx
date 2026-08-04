@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 import Footer from "./Footer.jsx";
 import NotificationPermissionBanner from "./NotificationPermissionBanner.jsx";
+import ReviewPrompt from "./ReviewPrompt.jsx";
 
 const MainLayout = () => (
   <div className="flex min-h-screen flex-col bg-bg">
@@ -11,6 +12,7 @@ const MainLayout = () => (
       <Outlet />
     </main>
     <Footer />
+    <ReviewPrompt />
   </div>
 );
 

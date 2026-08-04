@@ -149,6 +149,20 @@ export const getMyBookings = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { bookings }, "Bookings fetched"));
 });
 
+// GET /bookings/id/:id — same as getBookingByRef but by ObjectId, used by the
+// post-checkout review prompt (the "booking:statusUpdate" socket event only
+// carries a bookingId, not the ref).
+export const getBookingById = asyncHandler(async (req, res) => {
+  const booking = await Booking.findById(req.params.id)
+    .populate("hotel", "name slug images area address")
+    .populate("room", "type capacity");
+
+  if (!booking) throw new ApiError(404, "Booking not found");
+  await assertOwnership(booking, req.user);
+
+  res.status(200).json(new ApiResponse(200, { booking }, "Booking fetched"));
+});
+
 // GET /bookings/:ref
 export const getBookingByRef = asyncHandler(async (req, res) => {
   const booking = await Booking.findOne({ bookingRef: req.params.ref })
@@ -311,6 +325,7 @@ export const listAllBookings = asyncHandler(async (req, res) => {
 export default {
   createBooking,
   getMyBookings,
+  getBookingById,
   getBookingByRef,
   cancelBooking,
   rescheduleBooking,

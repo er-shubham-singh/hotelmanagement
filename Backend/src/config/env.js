@@ -39,6 +39,11 @@ export const config = {
     serviceAccountJson: process.env.FIREBASE_SERVICE_ACCOUNT_JSON || "",
     serviceAccountPath: process.env.FIREBASE_SERVICE_ACCOUNT_PATH || "",
   },
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME || "",
+    apiKey: process.env.CLOUDINARY_API_KEY || "",
+    apiSecret: process.env.CLOUDINARY_API_SECRET || "",
+  },
   jobsEnabled: process.env.JOBS_ENABLED !== "false",
   cron: {
     holdExpiry: process.env.CRON_HOLD_EXPIRY || "*/1 * * * *",
