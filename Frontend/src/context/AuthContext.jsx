@@ -58,6 +58,16 @@ export const AuthProvider = ({ children }) => {
     return data.data.user;
   };
 
+  const sendEmailOtp = (email) => authApi.sendEmailOtp(email);
+
+  const verifyEmailOtp = (email, code) => authApi.verifyEmailOtp(email, code);
+
+  const registerWithEmailOtp = async (payload) => {
+    const { data } = await authApi.registerWithEmail(payload);
+    applySession(data.data);
+    return data.data.user;
+  };
+
   const loginWithGoogle = async (referralCode) => {
     const idToken = await signInWithGoogle();
     const { data } = await authApi.googleLogin(idToken, referralCode);
@@ -88,6 +98,9 @@ export const AuthProvider = ({ children }) => {
         loginWithOtp,
         loginWithGoogle,
         registerWithPassword,
+        sendEmailOtp,
+        verifyEmailOtp,
+        registerWithEmailOtp,
         logout,
         refreshProfile,
       }}

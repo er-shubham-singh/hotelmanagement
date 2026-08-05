@@ -1,13 +1,16 @@
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import { AMENITY_LABELS, HOTEL_TAG_LABELS } from "../utils/constants.js";
 
-const FilterSidebar = ({ filters, onChange, areas = [] }) => {
+const FilterFields = ({ filters, onChange, areas }) => {
   const toggleTag = (tag) => {
     const next = filters.tags.includes(tag) ? filters.tags.filter((t) => t !== tag) : [...filters.tags, tag];
     onChange({ ...filters, tags: next });
   };
 
   return (
-    <aside className="w-full space-y-6 lg:w-64 lg:flex-shrink-0">
+    <div className="space-y-6">
       {areas.length > 0 && (
         <div className="card p-4">
           <h4 className="mb-3 text-sm font-semibold text-text">Area</h4>
@@ -74,7 +77,101 @@ const FilterSidebar = ({ filters, onChange, areas = [] }) => {
           ))}
         </div>
       </div>
-    </aside>
+    </div>
+  );
+};
+
+export const activeFilterCount = (filters) =>
+  (filters.area ? 1 : 0) + (filters.minPrice ? 1 : 0) + (filters.maxPrice ? 1 : 0) + filters.tags.length;
+
+// The mobile bottom-sheet's open state is controlled by the parent (so the
+// trigger button can live in the same row as the sort <Select> instead of
+// being rendered here) — `mobileOpen`/`onMobileOpenChange` from SearchResults.
+const FilterSidebar = ({ filters, onChange, areas = [], mobileOpen = false, onMobileOpenChange = () => {} }) => {
+  const [draft, setDraft] = useState(filters);
+
+  // Start each sheet session from whatever's currently applied.
+  useEffect(() => {
+    if (mobileOpen) setDraft(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileOpen]);
+
+  const applyFilters = () => {
+    onChange(draft);
+    onMobileOpenChange(false);
+  };
+
+  const cancelFilters = () => {
+    setDraft(filters);
+    onMobileOpenChange(false);
+  };
+
+  useEffect(() => {
+    if (!mobileOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (e) => e.key === "Escape" && cancelFilters();
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileOpen]);
+
+  return (
+    <>
+      {/* Desktop — always-visible sidebar, filters apply live (existing behavior). */}
+      <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0">
+        <FilterFields filters={filters} onChange={onChange} areas={areas} />
+      </aside>
+
+      {/* Mobile — bottom sheet with staged filters, opened by the parent's icon trigger.
+          Portaled to <body> so it never becomes a (zero-height but gap-consuming)
+          flex item inside whatever layout renders <FilterSidebar>. */}
+      {createPortal(
+        <div className="lg:hidden">
+          <div
+            className={`fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 ${
+              mobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+            onClick={cancelFilters}
+            aria-hidden="true"
+          />
+
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Filters"
+            aria-hidden={!mobileOpen}
+            className={`fixed inset-x-0 bottom-0 z-50 flex h-[80vh] flex-col rounded-t-2xl bg-bg shadow-soft-lg transition-transform duration-300 ease-in-out ${
+              mobileOpen ? "translate-y-0" : "translate-y-full"
+            }`}
+          >
+            <div className="flex flex-shrink-0 items-center justify-between border-b border-border px-5 py-4">
+              <h3 className="font-heading text-base font-semibold text-text">Filters</h3>
+              <button onClick={cancelFilters} aria-label="Close filters" className="rounded-lg p-1.5 text-text-muted hover:bg-surface-muted">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              <FilterFields filters={draft} onChange={setDraft} areas={areas} />
+            </div>
+
+            <div className="flex flex-shrink-0 gap-3 border-t border-border p-4">
+              <button type="button" onClick={cancelFilters} className="btn-outline flex-1 justify-center">
+                Cancel
+              </button>
+              <button type="button" onClick={applyFilters} className="btn-accent flex-1 justify-center">
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 };
 

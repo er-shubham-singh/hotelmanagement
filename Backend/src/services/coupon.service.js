@@ -1,10 +1,24 @@
 import { Offer } from "../models/offer.model.js";
+import { Booking } from "../models/booking.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import { OFFER_TYPES } from "../config/constants.js";
+import { OFFER_TYPES, BOOKING_STATUS } from "../config/constants.js";
 
-// Validates a coupon code against the order amount and returns the discount in ₹.
+// Booking states that count as this coupon actually having been "used" by the
+// user — a booking that was created with this code but never paid (ACCEPTED
+// that later expired, or was cancelled) does NOT consume the user's per-user
+// allowance, so an abandoned attempt doesn't burn their coupon use.
+const PAID_OR_FURTHER_STATUSES = [
+  BOOKING_STATUS.CONFIRMED,
+  BOOKING_STATUS.ACTIVE,
+  BOOKING_STATUS.CHECKED_IN,
+  BOOKING_STATUS.COMPLETED,
+  BOOKING_STATUS.OVERDUE,
+];
+
+// Validates a coupon code against the order amount (and, if provided, how many
+// times this specific user has already used it) and returns the discount in ₹.
 // Does not mark the coupon as used — call incrementUsage() only after a booking is confirmed.
-export const evaluateCoupon = async (code, amount) => {
+export const evaluateCoupon = async (code, amount, userId) => {
   if (!code) return { offer: null, discount: 0 };
 
   const offer = await Offer.findOne({ code: code.toUpperCase(), isActive: true });
@@ -16,6 +30,16 @@ export const evaluateCoupon = async (code, amount) => {
   }
   if (offer.usageLimit !== null && offer.usedCount >= offer.usageLimit) {
     throw new ApiError(400, "This coupon has reached its usage limit");
+  }
+  if (userId && offer.usageLimitPerUser !== null) {
+    const userUsageCount = await Booking.countDocuments({
+      user: userId,
+      couponCode: offer.code,
+      status: { $in: PAID_OR_FURTHER_STATUSES },
+    });
+    if (userUsageCount >= offer.usageLimitPerUser) {
+      throw new ApiError(400, "You have already used this coupon the maximum number of times");
+    }
   }
   if (amount < offer.minBooking) {
     throw new ApiError(400, `Minimum booking amount for this coupon is ₹${offer.minBooking}`);

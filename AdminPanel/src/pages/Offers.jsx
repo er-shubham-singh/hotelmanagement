@@ -38,6 +38,7 @@ const Offers = () => {
       validFrom: toDateInput(new Date()),
       validTo: toDateInput(new Date(Date.now() + 30 * 86400000)),
       usageLimit: "",
+      usageLimitPerUser: "1",
       isActive: true,
     });
     setIsModalOpen(true);
@@ -56,6 +57,7 @@ const Offers = () => {
       validFrom: toDateInput(offer.validFrom),
       validTo: toDateInput(offer.validTo),
       usageLimit: offer.usageLimit ?? "",
+      usageLimitPerUser: offer.usageLimitPerUser ?? "",
       isActive: offer.isActive,
     });
     setIsModalOpen(true);
@@ -68,6 +70,7 @@ const Offers = () => {
       maxDiscount: values.maxDiscount === "" ? null : Number(values.maxDiscount),
       minBooking: Number(values.minBooking) || 0,
       usageLimit: values.usageLimit === "" ? null : Number(values.usageLimit),
+      usageLimitPerUser: values.usageLimitPerUser === "" ? null : Number(values.usageLimitPerUser),
       isActive: values.isActive === true || values.isActive === "true",
     };
     try {
@@ -113,6 +116,7 @@ const Offers = () => {
                 <th>Title</th>
                 <th>Type</th>
                 <th>Value</th>
+                <th>Uses / User</th>
                 <th>Valid Till</th>
                 <th>Status</th>
                 <th></th>
@@ -125,6 +129,7 @@ const Offers = () => {
                   <td>{offer.title}</td>
                   <td className="capitalize">{offer.type}</td>
                   <td>{offer.type === "percent" ? `${offer.value}%` : `₹${offer.value}`}</td>
+                  <td>{offer.usageLimitPerUser ?? "Unlimited"}</td>
                   <td>{toDateInput(offer.validTo)}</td>
                   <td>
                     <Badge className={offer.isActive ? "text-success" : "text-danger"}>
@@ -171,13 +176,23 @@ const Offers = () => {
             <Input label="Valid From" type="date" {...register("validFrom", { required: true })} />
             <Input label="Valid To" type="date" {...register("validTo", { required: true })} />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input label="Usage Limit (blank = unlimited)" type="number" {...register("usageLimit")} />
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Input label="Total Usage Limit (blank = unlimited)" type="number" {...register("usageLimit")} />
+            <Input
+              label="Uses Per User (blank = unlimited)"
+              type="number"
+              min={1}
+              {...register("usageLimitPerUser")}
+            />
             <Select label="Status" {...register("isActive")}>
               <option value="true">Active</option>
               <option value="false">Inactive</option>
             </Select>
           </div>
+          <p className="text-xs text-text-muted">
+            A booking only counts against a guest's per-user limit once it's actually paid — an applied-but-abandoned
+            hold doesn't use it up.
+          </p>
           <Button type="submit" className="w-full" isLoading={isSubmitting}>
             Save Offer
           </Button>

@@ -14,6 +14,7 @@ const Select = forwardRef(({ label, error, className = "", id, children, ...prop
         <select
           id={selectId}
           ref={ref}
+          style={{ WebkitAppearance: "none", MozAppearance: "none", appearance: "none" }}
           className={`input appearance-none pr-9 ${error ? "border-danger" : ""} ${className}`}
           {...props}
         >

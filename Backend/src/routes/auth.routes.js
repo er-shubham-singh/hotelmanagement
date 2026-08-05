@@ -4,6 +4,9 @@ import { body } from "express-validator";
 import {
   sendOtp,
   verifyOtp,
+  sendEmailOtp,
+  verifyEmailOtp,
+  registerWithEmail,
   register,
   login,
   googleLogin,
@@ -65,6 +68,37 @@ router.post(
 );
 
 router.post("/google", authLimiter, [body("idToken").isString().notEmpty()], validate, googleLogin);
+
+router.post(
+  "/email/send-otp",
+  authLimiter,
+  [body("email").isEmail().withMessage("Valid email required")],
+  validate,
+  sendEmailOtp
+);
+
+router.post(
+  "/email/verify-otp",
+  authLimiter,
+  [
+    body("email").isEmail().withMessage("Valid email required"),
+    body("code").isString().isLength({ min: 6, max: 6 }).withMessage("6-digit code required"),
+  ],
+  validate,
+  verifyEmailOtp
+);
+
+router.post(
+  "/email/register",
+  authLimiter,
+  [
+    body("name").isString().trim().notEmpty(),
+    body("email").isEmail().withMessage("Valid email required"),
+    body("password").isString().isLength({ min: 6 }),
+  ],
+  validate,
+  registerWithEmail
+);
 
 router.post("/refresh", refresh);
 router.post("/logout", logout);

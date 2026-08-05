@@ -7,7 +7,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/generateTokens.js";
 import { parseDuration } from "../utils/parseDuration.js";
 import { config } from "../config/env.js";
-import { issueOtp, verifyOtpCode } from "../services/otp.service.js";
+import { issueOtp, verifyOtpCode, markVerified, isVerified, clearVerified } from "../services/otp.service.js";
+import { sendEmailOtpEmail } from "../services/email.service.js";
 import { generateReferralCode } from "../services/referral.service.js";
 import { verifyGoogleIdToken } from "../notifications/firebase.js";
 import { AUTH_PROVIDERS } from "../config/constants.js";
@@ -91,6 +92,78 @@ export const verifyOtp = asyncHandler(async (req, res) => {
   res.status(200).json(
     new ApiResponse(200, { user: user.toSafeObject(), accessToken, isNewUser }, "Logged in successfully")
   );
+});
+
+// POST /auth/email/send-otp { email } — email signup, step 1. The code is
+// NEVER put in the response (unlike the phone flow's dev-mode devOtp) — it is
+// only ever delivered by email, so it's never visible on-screen.
+export const sendEmailOtp = asyncHandler(async (req, res) => {
+  const email = req.body.email?.toLowerCase();
+  if (!email) throw new ApiError(400, "Email is required");
+
+  const existing = await User.findOne({ email });
+  if (existing) throw new ApiError(409, "An account with this email already exists — please login instead");
+
+  const result = issueOtp(email);
+  if (result.throttled) {
+    throw new ApiError(429, `Please wait before requesting another OTP (${Math.ceil(result.waitMs / 1000)}s)`);
+  }
+
+  await sendEmailOtpEmail(email, { code: result.code });
+
+  res.status(200).json(new ApiResponse(200, null, "OTP sent to your email"));
+});
+
+// POST /auth/email/verify-otp { email, code } — email signup, step 2. Marks
+// the email as verified (15 min window) so registerWithEmail can finish
+// account creation without requiring the OTP a second time.
+export const verifyEmailOtp = asyncHandler(async (req, res) => {
+  const email = req.body.email?.toLowerCase();
+  const { code } = req.body;
+  if (!email || !code) throw new ApiError(400, "Email and code are required");
+
+  const result = verifyOtpCode(email, code);
+  if (!result.valid) throw new ApiError(400, result.reason);
+
+  markVerified(email);
+  res.status(200).json(new ApiResponse(200, null, "Email verified"));
+});
+
+// POST /auth/email/register { name, email, password, referralCode? } — email
+// signup, step 3. Only succeeds if this email just passed verifyEmailOtp.
+export const registerWithEmail = asyncHandler(async (req, res) => {
+  const { name, password, referralCode } = req.body;
+  const email = req.body.email?.toLowerCase();
+  if (!name || !email || !password) {
+    throw new ApiError(400, "Name, email, and password are required");
+  }
+  if (!isVerified(email)) {
+    throw new ApiError(400, "Please verify your email with the OTP before setting a password");
+  }
+
+  const existing = await User.findOne({ email });
+  if (existing) throw new ApiError(409, "An account with this email already exists");
+
+  const [passwordHash, ownReferralCode, referredBy] = await Promise.all([
+    bcrypt.hash(password, 10),
+    generateReferralCode(name),
+    resolveReferrer(referralCode),
+  ]);
+  const user = await User.create({
+    name,
+    email,
+    passwordHash,
+    isEmailVerified: true,
+    authProvider: AUTH_PROVIDERS.LOCAL,
+    referralCode: ownReferralCode,
+    referredBy,
+  });
+  await createWalletFor(user._id);
+  clearVerified(email);
+
+  const accessToken = await issueSession(res, user);
+
+  res.status(201).json(new ApiResponse(201, { user: user.toSafeObject(), accessToken }, "Account created"));
 });
 
 // POST /auth/register { name, email, phone, password, referralCode? }
@@ -228,4 +301,16 @@ export const getMe = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { user: req.user.toSafeObject() }, "Current user"));
 });
 
-export default { sendOtp, verifyOtp, register, login, googleLogin, refresh, logout, getMe };
+export default {
+  sendOtp,
+  verifyOtp,
+  sendEmailOtp,
+  verifyEmailOtp,
+  registerWithEmail,
+  register,
+  login,
+  googleLogin,
+  refresh,
+  logout,
+  getMe,
+};

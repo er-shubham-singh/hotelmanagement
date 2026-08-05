@@ -7,6 +7,12 @@ export const verifyOtp = (phone, code, name, referralCode) =>
 
 export const register = (payload) => axiosClient.post("/auth/register", payload);
 
+export const sendEmailOtp = (email) => axiosClient.post("/auth/email/send-otp", { email });
+
+export const verifyEmailOtp = (email, code) => axiosClient.post("/auth/email/verify-otp", { email, code });
+
+export const registerWithEmail = (payload) => axiosClient.post("/auth/email/register", payload);
+
 export const googleLogin = (idToken, referralCode) => axiosClient.post("/auth/google", { idToken, referralCode });
 
 export const login = (identifier, password) => axiosClient.post("/auth/login", { identifier, password });

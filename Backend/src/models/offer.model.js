@@ -12,8 +12,9 @@ const offerSchema = new mongoose.Schema(
     minBooking: { type: Number, default: 0 },
     validFrom: { type: Date, required: true },
     validTo: { type: Date, required: true },
-    usageLimit: { type: Number, default: null }, // null = unlimited
+    usageLimit: { type: Number, default: null }, // null = unlimited, across all users
     usedCount: { type: Number, default: 0 },
+    usageLimitPerUser: { type: Number, default: 1 }, // null = unlimited per user; how many times ONE user may use this code
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

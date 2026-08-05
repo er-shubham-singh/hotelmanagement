@@ -2,11 +2,12 @@ import { useMemo, useState } from "react";
 import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { SlidersHorizontal, Wifi, Snowflake, Tv, Droplets } from "lucide-react";
 import HotelCard from "../components/HotelCard.jsx";
-import FilterSidebar from "../components/FilterSidebar.jsx";
+import FilterSidebar, { activeFilterCount } from "../components/FilterSidebar.jsx";
 import Loader from "../common/Loader.jsx";
 import EmptyState from "../common/EmptyState.jsx";
 import Select from "../common/Select.jsx";
 import Button from "../common/Button.jsx";
+import Badge from "../common/Badge.jsx";
 import { useHotelSearch } from "../hooks/useHotels.js";
 import { useDebounce } from "../hooks/useDebounce.js";
 
@@ -25,6 +26,7 @@ const SearchResults = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("recommended");
   const [filters, setFilters] = useState({ area: "", minPrice: "", maxPrice: "", tags: [] });
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
   const debouncedMin = useDebounce(filters.minPrice);
   const debouncedMax = useDebounce(filters.maxPrice);
@@ -77,23 +79,41 @@ const SearchResults = () => {
         </div>
       </section>
 
-      <div className="container-app py-6">
-      <div className="mb-6 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text-muted">
-        <SlidersHorizontal className="h-4 w-4" />
-        Standard amenities across our partner hotels:
+      <div className="container-app pt-6 pb-0">
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text-muted">
+        <span>Standard amenities:</span>
         {AMENITY_ICONS.map((a) => (
-          <span key={a.label} className="flex items-center gap-1">
+          <Badge key={a.label} className="gap-1">
             <a.icon className="h-3.5 w-3.5" /> {a.label}
-          </span>
+          </Badge>
         ))}
       </div>
 
       <div className="flex flex-col gap-6 lg:flex-row">
-        <FilterSidebar filters={filters} onChange={setFilters} areas={areas} />
+        <FilterSidebar
+          filters={filters}
+          onChange={setFilters}
+          areas={areas}
+          mobileOpen={isFilterSheetOpen}
+          onMobileOpenChange={setIsFilterSheetOpen}
+        />
 
         <div className="flex-1">
-          <div className="mb-4 flex items-center justify-end">
-            <Select value={sort} onChange={(e) => setSort(e.target.value)} className="w-48">
+          <div className="mb-4 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsFilterSheetOpen(true)}
+              aria-label="Open filters"
+              className="btn-outline relative flex-shrink-0 px-3 lg:hidden"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeFilterCount(filters) > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
+                  {activeFilterCount(filters)}
+                </span>
+              )}
+            </button>
+            <Select value={sort} onChange={(e) => setSort(e.target.value)} className="flex-1 lg:ml-auto lg:max-w-48 lg:flex-none">
               <option value="recommended">Recommended</option>
               <option value="rating_desc">Highest Rated</option>
               <option value="newest">Newest</option>

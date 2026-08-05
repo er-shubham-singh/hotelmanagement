@@ -11,6 +11,7 @@ import Badge from "../common/Badge.jsx";
 import ImageCarousel from "../components/ImageCarousel.jsx";
 import { useHotelDetail, useHotelReviews, useRoomAvailability } from "../hooks/useHotels.js";
 import { useAuth } from "../hooks/useAuth.js";
+import { useDebounce } from "../hooks/useDebounce.js";
 import { formatCurrency, formatDate, getDefaultCheckInTime } from "../utils/formatters.js";
 import { DURATION_OPTIONS, FULL_DAY_DURATION, HOTEL_TAG_LABELS, AMENITY_LABELS } from "../utils/constants.js";
 import { addFavourite } from "../api/user.api.js";
@@ -34,7 +35,22 @@ const HotelDetail = () => {
   const [rooms, setRooms] = useState(1);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
 
-  const { data, isLoading } = useHotelDetail(slug, { checkIn: checkInDate, time: checkInTime, duration, adults, children });
+  // Debounced so adjusting the slot (typing adults/children, nudging the date/time
+  // picker) doesn't fire an API call on every keystroke — mirrors the price-range
+  // filter debounce on the search results page.
+  const debouncedCheckInDate = useDebounce(checkInDate);
+  const debouncedCheckInTime = useDebounce(checkInTime);
+  const debouncedDuration = useDebounce(duration);
+  const debouncedAdults = useDebounce(adults);
+  const debouncedChildren = useDebounce(children);
+
+  const { data, isLoading } = useHotelDetail(slug, {
+    checkIn: debouncedCheckInDate,
+    time: debouncedCheckInTime,
+    duration: debouncedDuration,
+    adults: debouncedAdults,
+    children: debouncedChildren,
+  });
   const { data: reviews } = useHotelReviews(data?.hotel?._id);
 
   const roomList = data?.rooms || [];
@@ -46,9 +62,9 @@ const HotelDetail = () => {
   const hasSlotPrice = unitPrice != null;
 
   const { data: availability, isFetching: isCheckingAvailability } = useRoomAvailability(activeRoomId, {
-    checkInDate,
-    checkInTime,
-    durationHrs: duration,
+    checkInDate: debouncedCheckInDate,
+    checkInTime: debouncedCheckInTime,
+    durationHrs: debouncedDuration,
   });
   const isSoldOut = availability != null && availability.available < rooms;
   const isAvailable = hasSlotPrice && !isSoldOut;

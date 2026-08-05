@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Phone, KeyRound, Mail } from "lucide-react";
+import { Phone, KeyRound, Mail, User } from "lucide-react";
 import Input from "../common/Input.jsx";
 import Button from "../common/Button.jsx";
 import GoogleIcon from "../common/GoogleIcon.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { sendOtp as sendOtpApi } from "../api/auth.api.js";
-import { isValidPhone, isValidOtp } from "../utils/validators.js";
+import { isValidPhone, isValidOtp, isValidEmail } from "../utils/validators.js";
 
 const TABS = { OTP: "otp", PASSWORD: "password" };
+const PASSWORD_MODES = { LOGIN: "login", SIGNUP: "signup" };
+const SIGNUP_STEPS = { EMAIL: "email", OTP: "otp", PASSWORD: "password" };
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -22,13 +24,22 @@ const Login = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResending, setIsResending] = useState(false);
-  const { loginWithOtp, loginWithPassword, loginWithGoogle } = useAuth();
+  const [passwordMode, setPasswordMode] = useState(PASSWORD_MODES.LOGIN);
+  const [signupStep, setSignupStep] = useState(SIGNUP_STEPS.EMAIL);
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupName, setSignupName] = useState("");
+  const [signupResendCooldown, setSignupResendCooldown] = useState(0);
+  const { loginWithOtp, loginWithPassword, loginWithGoogle, sendEmailOtp, verifyEmailOtp, registerWithEmailOtp } =
+    useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = location.state?.from?.pathname || "/";
 
   const otpForm = useForm();
   const passwordForm = useForm();
+  const signupEmailForm = useForm();
+  const signupOtpForm = useForm();
+  const signupPasswordForm = useForm();
 
   // Ticks the resend cooldown down every second while the code screen is showing.
   useEffect(() => {
@@ -36,6 +47,12 @@ const Login = () => {
     const timer = setInterval(() => setResendCooldown((s) => Math.max(0, s - 1)), 1000);
     return () => clearInterval(timer);
   }, [resendCooldown]);
+
+  useEffect(() => {
+    if (signupResendCooldown <= 0) return undefined;
+    const timer = setInterval(() => setSignupResendCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(timer);
+  }, [signupResendCooldown]);
 
   const requestOtp = async (phoneValue) => {
     const { data } = await sendOtpApi(phoneValue);
@@ -111,10 +128,85 @@ const Login = () => {
       toast.success("Logged in successfully");
       navigate(redirectTo, { replace: true });
     } catch (error) {
+      // handled by interceptor (shows "Invalid credentials" for wrong email/phone or password)
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const requestSignupOtp = async (email) => {
+    await sendEmailOtp(email);
+    setSignupEmail(email);
+    setSignupResendCooldown(RESEND_COOLDOWN_SECONDS);
+    toast.success("OTP sent to your email — check your inbox");
+  };
+
+  const handleSignupSendOtp = async ({ name, email }) => {
+    if (!isValidEmail(email)) {
+      signupEmailForm.setError("email", { message: "Enter a valid email address" });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await requestSignupOtp(email);
+      setSignupName(name);
+      setSignupStep(SIGNUP_STEPS.OTP);
+    } catch (error) {
+      // handled by interceptor (e.g. "account already exists — please login instead")
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSignupResendOtp = async () => {
+    if (signupResendCooldown > 0) return;
+    setIsResending(true);
+    try {
+      signupOtpForm.setValue("code", "");
+      await requestSignupOtp(signupEmail);
+    } catch (error) {
+      // handled by interceptor
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const handleSignupVerifyOtp = async ({ code }) => {
+    if (!isValidOtp(code)) {
+      signupOtpForm.setError("code", { message: "Enter the 6-digit OTP" });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await verifyEmailOtp(signupEmail, code);
+      toast.success("Email verified — now set a password");
+      setSignupStep(SIGNUP_STEPS.PASSWORD);
+    } catch (error) {
       // handled by interceptor
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSignupSetPassword = async ({ password, referralCode }) => {
+    setIsSubmitting(true);
+    try {
+      await registerWithEmailOtp({ name: signupName, email: signupEmail, password, referralCode });
+      toast.success("Account created — welcome to StayByHour!");
+      navigate(redirectTo, { replace: true });
+    } catch (error) {
+      // handled by interceptor
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetSignup = () => {
+    setPasswordMode(PASSWORD_MODES.LOGIN);
+    setSignupStep(SIGNUP_STEPS.EMAIL);
+    signupEmailForm.reset();
+    signupOtpForm.reset();
+    signupPasswordForm.reset();
   };
 
   return (
@@ -207,24 +299,133 @@ const Login = () => {
           )}
 
           {tab === TABS.PASSWORD && (
-            <form onSubmit={passwordForm.handleSubmit(handlePasswordLogin)} className="mt-6 space-y-4">
-              <Input
-                label="Email or Phone"
-                icon={Mail}
-                error={passwordForm.formState.errors.identifier?.message}
-                {...passwordForm.register("identifier", { required: "Required" })}
-              />
-              <Input
-                label="Password"
-                type="password"
-                icon={KeyRound}
-                error={passwordForm.formState.errors.password?.message}
-                {...passwordForm.register("password", { required: "Required" })}
-              />
-              <Button type="submit" className="w-full" isLoading={isSubmitting}>
-                Login
-              </Button>
-            </form>
+            <div className="mt-6">
+              <div className="mb-4 flex justify-center gap-4 text-sm">
+                <button
+                  type="button"
+                  onClick={() => setPasswordMode(PASSWORD_MODES.LOGIN)}
+                  className={`font-medium ${passwordMode === PASSWORD_MODES.LOGIN ? "text-primary" : "text-text-muted hover:text-text"}`}
+                >
+                  Login
+                </button>
+                <span className="text-border">|</span>
+                <button
+                  type="button"
+                  onClick={() => setPasswordMode(PASSWORD_MODES.SIGNUP)}
+                  className={`font-medium ${passwordMode === PASSWORD_MODES.SIGNUP ? "text-primary" : "text-text-muted hover:text-text"}`}
+                >
+                  Sign Up
+                </button>
+              </div>
+
+              {passwordMode === PASSWORD_MODES.LOGIN && (
+                <form onSubmit={passwordForm.handleSubmit(handlePasswordLogin)} className="space-y-4">
+                  <Input
+                    label="Email or Phone"
+                    icon={Mail}
+                    error={passwordForm.formState.errors.identifier?.message}
+                    {...passwordForm.register("identifier", { required: "Required" })}
+                  />
+                  <Input
+                    label="Password"
+                    type="password"
+                    icon={KeyRound}
+                    error={passwordForm.formState.errors.password?.message}
+                    {...passwordForm.register("password", { required: "Required" })}
+                  />
+                  <Button type="submit" className="w-full" isLoading={isSubmitting}>
+                    Login
+                  </Button>
+                </form>
+              )}
+
+              {passwordMode === PASSWORD_MODES.SIGNUP && (
+                <>
+                  {signupStep === SIGNUP_STEPS.EMAIL && (
+                    <form onSubmit={signupEmailForm.handleSubmit(handleSignupSendOtp)} className="space-y-4">
+                      <Input
+                        label="Your Name"
+                        icon={User}
+                        error={signupEmailForm.formState.errors.name?.message}
+                        {...signupEmailForm.register("name", { required: "Name is required" })}
+                      />
+                      <Input
+                        label="Email"
+                        type="email"
+                        icon={Mail}
+                        error={signupEmailForm.formState.errors.email?.message}
+                        {...signupEmailForm.register("email", { required: "Email is required" })}
+                      />
+                      <Button type="submit" className="w-full" isLoading={isSubmitting}>
+                        Send OTP to Email
+                      </Button>
+                    </form>
+                  )}
+
+                  {signupStep === SIGNUP_STEPS.OTP && (
+                    <form onSubmit={signupOtpForm.handleSubmit(handleSignupVerifyOtp)} className="space-y-4">
+                      <p className="text-sm text-text-muted">
+                        We emailed a 6-digit code to <span className="font-medium text-text">{signupEmail}</span>. It won't
+                        appear here — check your inbox.
+                      </p>
+                      <Input
+                        label="OTP"
+                        placeholder="123456"
+                        maxLength={6}
+                        error={signupOtpForm.formState.errors.code?.message}
+                        {...signupOtpForm.register("code", { required: "OTP is required" })}
+                      />
+                      <Button type="submit" className="w-full" isLoading={isSubmitting}>
+                        Verify Email
+                      </Button>
+                      <div className="flex items-center justify-between text-sm">
+                        <button type="button" className="text-text-muted hover:text-primary" onClick={() => setSignupStep(SIGNUP_STEPS.EMAIL)}>
+                          Change email
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSignupResendOtp}
+                          disabled={signupResendCooldown > 0 || isResending}
+                          className="font-medium text-primary disabled:cursor-not-allowed disabled:text-text-muted"
+                        >
+                          {isResending
+                            ? "Resending…"
+                            : signupResendCooldown > 0
+                              ? `Resend OTP in ${signupResendCooldown}s`
+                              : "Resend OTP"}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {signupStep === SIGNUP_STEPS.PASSWORD && (
+                    <form onSubmit={signupPasswordForm.handleSubmit(handleSignupSetPassword)} className="space-y-4">
+                      <p className="text-sm text-success">Email verified ✓ — set a password to finish creating your account.</p>
+                      <Input
+                        label="Password"
+                        type="password"
+                        icon={KeyRound}
+                        error={signupPasswordForm.formState.errors.password?.message}
+                        {...signupPasswordForm.register("password", {
+                          required: "Password is required",
+                          minLength: { value: 6, message: "At least 6 characters" },
+                        })}
+                      />
+                      <Input label="Referral Code (optional)" placeholder="e.g. DEMO1AB2" {...signupPasswordForm.register("referralCode")} />
+                      <Button type="submit" className="w-full" isLoading={isSubmitting}>
+                        Create Account
+                      </Button>
+                    </form>
+                  )}
+
+                  {passwordMode === PASSWORD_MODES.SIGNUP && signupStep !== SIGNUP_STEPS.EMAIL && (
+                    <button type="button" onClick={resetSignup} className="mt-4 block w-full text-center text-xs text-text-muted hover:text-primary">
+                      Start over
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           )}
 
           <p className="mt-6 text-center text-xs text-text-muted">

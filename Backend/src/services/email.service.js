@@ -5,6 +5,7 @@ import { paymentReceiptEmail } from "../emails/templates/paymentReceipt.js";
 import { checkInCodeEmail } from "../emails/templates/checkInCode.js";
 import { checkOutCodeEmail } from "../emails/templates/checkOutCode.js";
 import { thankYouEmail } from "../emails/templates/thankYou.js";
+import { emailOtpEmail } from "../emails/templates/emailOtp.js";
 
 export const sendEmail = async ({ to, subject, html, text, attachments }) => {
   if (!to) return null; // e.g. a guest who signed up via phone with no email on file
@@ -40,6 +41,8 @@ export const sendCheckOutCodeEmail = (to, data) => sendEmail({ to, ...checkOutCo
 
 export const sendThankYouEmail = (to, data) => sendEmail({ to, ...thankYouEmail(data) });
 
+export const sendEmailOtpEmail = (to, data) => sendEmail({ to, ...emailOtpEmail(data) });
+
 export default {
   sendEmail,
   sendBookingConfirmedEmail,
@@ -47,4 +50,5 @@ export default {
   sendCheckInCodeEmail,
   sendCheckOutCodeEmail,
   sendThankYouEmail,
+  sendEmailOtpEmail,
 };

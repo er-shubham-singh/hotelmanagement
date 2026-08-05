@@ -85,7 +85,7 @@ export const createBooking = asyncHandler(async (req, res) => {
 
   let coupon = null;
   if (couponCode) {
-    const { offer, discount } = await evaluateCoupon(couponCode, pricing.base + pricing.tax);
+    const { offer, discount } = await evaluateCoupon(couponCode, pricing.base + pricing.tax, req.user._id);
     coupon = offer;
     pricing = calculatePricing({ room, durationHrs, roomsCount: rooms, discount });
   }

@@ -14,12 +14,13 @@ export const listOffers = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { offers }, "Offers fetched"));
 });
 
-// POST /offers/validate { code, amount }
+// POST /offers/validate { code, amount } — optionalAuthenticate, so a logged-in
+// user's per-user usage limit is enforced here too (not just at booking time).
 export const validateOffer = asyncHandler(async (req, res) => {
   const { code, amount } = req.body;
   if (!code || amount == null) throw new ApiError(400, "code and amount are required");
 
-  const { offer, discount } = await evaluateCoupon(code, Number(amount));
+  const { offer, discount } = await evaluateCoupon(code, Number(amount), req.user?._id);
   res.status(200).json(new ApiResponse(200, { offer, discount }, "Coupon is valid"));
 });
 

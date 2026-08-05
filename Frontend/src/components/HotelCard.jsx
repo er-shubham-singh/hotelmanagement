@@ -24,13 +24,16 @@ const HotelCard = ({ hotel }) => {
 
       <div className="flex flex-1 flex-col p-4 sm:pl-0">
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="min-w-0">
             <h3 className="font-heading text-lg font-semibold text-text">{hotel.name}</h3>
-            <p className="mt-0.5 flex items-center gap-1 text-sm text-text-muted">
-              <MapPin className="h-3.5 w-3.5" /> {hotel.area}, {hotel.city?.name}
+            <p className="mt-1 flex items-start gap-1 text-sm text-text-muted">
+              <MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+              <span>
+                {hotel.area}, {hotel.city?.name}
+              </span>
             </p>
           </div>
-          <Rating value={hotel.rating || 0} reviewCount={hotel.reviewCount} />
+          <Rating value={hotel.rating || 0} reviewCount={hotel.reviewCount} stacked />
         </div>
 
         <div className="mt-3 flex flex-wrap gap-1.5">

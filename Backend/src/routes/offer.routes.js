@@ -7,7 +7,7 @@ import { ROLES } from "../config/constants.js";
 const router = Router();
 
 router.get("/", optionalAuthenticate, listOffers);
-router.post("/validate", validateOffer);
+router.post("/validate", optionalAuthenticate, validateOffer);
 router.post("/", authenticate, requireRole(ROLES.ADMIN), createOffer);
 router.put("/:id", authenticate, requireRole(ROLES.ADMIN), updateOffer);
 router.delete("/:id", authenticate, requireRole(ROLES.ADMIN), deleteOffer);
