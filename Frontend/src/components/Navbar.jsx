@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, Moon, Sun, User, Wallet, LogOut, Clock } from "lucide-react";
+import { Menu, Moon, Sun, User, Wallet, LogOut, ArrowRight } from "lucide-react";
 import { useAuth } from "../hooks/useAuth.js";
 import { useTheme } from "../hooks/useTheme.js";
+import { useScrollDirection } from "../hooks/useScrollDirection.js";
 import { env } from "../config/env.js";
 import NotificationBell from "./NotificationBell.jsx";
 import MobileDrawer from "./MobileDrawer.jsx";
@@ -18,6 +19,7 @@ const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const scrollDirection = useScrollDirection();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -28,13 +30,15 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface">
-      <nav className="container-app flex h-16 items-center justify-between">
+    <header
+      className={`sticky top-0 z-40 px-3 pt-3 transition-transform duration-300 ease-in-out sm:px-4 sm:pt-4 ${
+        scrollDirection === "down" ? "-translate-y-32 md:translate-y-0" : "translate-y-0"
+      }`}
+    >
+      <nav className="container-app flex h-16 items-center justify-between rounded-full border border-border bg-surface px-3 shadow-soft-lg sm:px-5">
         <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold text-text">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white">
-            <Clock className="h-5 w-5" />
-          </span>
-          {env.appName}
+          <img src="/logo.png" alt={env.appName} className="h-10 w-10 object-contain" />
+          <span className="hidden sm:inline">{env.appName}</span>
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
@@ -66,7 +70,7 @@ const Navbar = () => {
             <div className="relative hidden md:block">
               <button
                 onClick={() => setIsProfileOpen((v) => !v)}
-                className="flex items-center gap-2 rounded-xl border border-border px-3 py-1.5 text-sm font-medium hover:bg-surface-muted"
+                className="flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:bg-surface-muted"
               >
                 <User className="h-4 w-4" />
                 {user?.name?.split(" ")[0]}
@@ -92,8 +96,8 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" className="btn-primary hidden md:inline-flex">
-              Login / Sign up
+            <Link to="/login" className="btn-primary hidden rounded-full md:inline-flex">
+              Login / Sign up <ArrowRight className="h-4 w-4" />
             </Link>
           )}
 

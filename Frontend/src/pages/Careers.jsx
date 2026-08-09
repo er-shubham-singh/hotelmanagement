@@ -7,7 +7,7 @@ const OPEN_ROLES = [
 const Careers = () => (
   <div className="container-app py-6 sm:py-10">
     <div className="mb-6 text-center">
-      <h1 className="font-heading text-3xl font-bold text-text">Careers at StayByHour</h1>
+      <h1 className="font-heading text-3xl font-bold text-text">Careers at Natasha Hotels</h1>
       <p className="mt-2 text-text-muted">We're building the easiest way to book a room for a few hours — join us.</p>
     </div>
 

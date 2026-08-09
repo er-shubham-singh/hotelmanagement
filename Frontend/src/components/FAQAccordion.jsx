@@ -20,7 +20,7 @@ export const DEFAULT_FAQS = [
   },
   {
     q: "How does the wallet cashback work?",
-    a: "Cashback is credited to your StayByHour wallet after a completed stay and can be redeemed against future bookings, partially or in full.",
+    a: "Cashback is credited to your Natasha Hotels wallet after a completed stay and can be redeemed against future bookings, partially or in full.",
   },
 ];
 

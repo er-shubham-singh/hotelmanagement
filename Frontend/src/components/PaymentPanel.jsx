@@ -74,10 +74,10 @@ const PaymentPanel = ({ bookingId, bookingRef, amount, guest, mode = "booking", 
         amount: order.amount,
         currency: order.currency || "INR",
         order_id: order.orderId,
-        name: "StayByHour",
+        name: "Natasha Hotels",
         description: mode === "fine" ? `Overdue fine — ${bookingRef}` : `Booking ${bookingRef}`,
         prefill: { name: guest?.name || user?.name, contact: guest?.phone || user?.phone, email: user?.email },
-        theme: { color: "#1b4332" },
+        theme: { color: "#0e5c54" },
         handler: async (response) => {
           try {
             await orderFns.verify({
@@ -129,7 +129,7 @@ const PaymentPanel = ({ bookingId, bookingRef, amount, guest, mode = "booking", 
   };
 
   const shareOnWhatsApp = () => {
-    const text = encodeURIComponent(`Pay for StayByHour booking ${bookingRef}: ${qr.url}`);
+    const text = encodeURIComponent(`Pay for Natasha Hotels booking ${bookingRef}: ${qr.url}`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 

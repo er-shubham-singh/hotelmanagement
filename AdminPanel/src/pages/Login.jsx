@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Clock } from "lucide-react";
 import Input from "../common/Input.jsx";
 import Button from "../common/Button.jsx";
 import { useAuth } from "../hooks/useAuth.js";
@@ -25,10 +24,8 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center bg-bg px-4">
       <div className="w-full max-w-sm card p-8">
         <div className="mb-6 flex flex-col items-center text-center">
-          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white">
-            <Clock className="h-6 w-6" />
-          </span>
-          <h1 className="font-heading text-xl font-bold text-text">StayByHour Admin</h1>
+          <img src="/logo.png" alt="Natasha Hotels" className="mb-3 h-14 w-14 object-contain" />
+          <h1 className="font-heading text-xl font-bold text-text">Natasha Hotels Admin</h1>
           <p className="mt-1 text-sm text-text-muted">Sign in with your admin or hotel-owner account</p>
         </div>
 

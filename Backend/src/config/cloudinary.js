@@ -16,9 +16,9 @@ if (isCloudinaryConfigured) {
   });
 }
 
-export const uploadBufferToCloudinary = (buffer, folder = "staybyhour/hotels") =>
+export const uploadBufferToCloudinary = (buffer, folder = "staybyhour/hotels", resourceType = "image") =>
   new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream({ folder, resource_type: "image" }, (error, result) => {
+    const stream = cloudinary.uploader.upload_stream({ folder, resource_type: resourceType }, (error, result) => {
       if (error) return reject(error);
       resolve(result);
     });

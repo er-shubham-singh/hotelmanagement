@@ -78,3 +78,34 @@
     @apply inline-flex items-center rounded-full bg-surface-muted px-2.5 py-1 text-xs font-medium text-text-muted;
   }
 }
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dot-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-fade-slide-up {
+  animation: fade-slide-up 0.7s ease-out both;
+}
+
+.animate-dot-fill {
+  animation-name: dot-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  transform-origin: left;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { X, Moon, Sun, User, LogOut, Clock } from "lucide-react";
+import { X, Moon, Sun, User, LogOut } from "lucide-react";
 import { CITY_CHIPS } from "../utils/constants.js";
 
 // Full-height left-to-right slide-in drawer for mobile nav. Always mounted
@@ -82,10 +82,8 @@ const MobileDrawer = ({ isOpen, onClose, navLinks, isAuthenticated, user, theme,
       >
         <div className="flex flex-shrink-0 items-center justify-between border-b border-border px-5 py-4">
           <Link to="/" className="flex items-center gap-2 font-heading text-lg font-bold text-text" onClick={onClose}>
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white">
-              <Clock className="h-4 w-4" />
-            </span>
-            StayByHour
+            <img src="/logo.png" alt="Natasha Hotels" className="h-8 w-8 object-contain" />
+            Natasha Hotels
           </Link>
           <button onClick={onClose} aria-label="Close menu" className="rounded-lg p-2 text-text-muted hover:bg-surface-muted">
             <X className="h-5 w-5" />

@@ -40,7 +40,10 @@ router.post(
   "/hotels/:id/images",
   authenticate,
   requireRole(...manageRoles),
-  upload.array("images", 10),
+  upload.fields([
+    { name: "images", maxCount: 5 },
+    { name: "video", maxCount: 1 },
+  ]),
   uploadHotelImages
 );
 

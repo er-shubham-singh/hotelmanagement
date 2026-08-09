@@ -27,7 +27,7 @@ export const generateInvoice = async (booking) => {
     const stream = fs.createWriteStream(filepath);
     doc.pipe(stream);
 
-    doc.fontSize(20).text("StayByHour", { continued: false });
+    doc.fontSize(20).text("Natasha Hotels", { continued: false });
     doc.fontSize(10).fillColor("#64748b").text("Tax Invoice / Receipt").moveDown(1.5);
 
     doc.fillColor("#0f172a").fontSize(12).text(`Invoice for booking: ${populated.bookingRef}`);
@@ -61,8 +61,8 @@ export const generateInvoice = async (booking) => {
   if (populated.user?.email) {
     await sendEmail({
       to: populated.user.email,
-      subject: `Your StayByHour invoice — ${populated.bookingRef}`,
-      text: `Thanks for staying with StayByHour. Your invoice is attached.`,
+      subject: `Your Natasha Hotels invoice — ${populated.bookingRef}`,
+      text: `Thanks for staying with Natasha Hotels. Your invoice is attached.`,
       attachments: [{ filename, path: filepath }],
     }).catch(() => null);
   }

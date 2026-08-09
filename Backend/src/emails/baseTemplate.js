@@ -30,7 +30,7 @@ export const wrapEmail = ({ title, preheader = "", bodyHtml, ctaLabel, ctaUrl })
                 <table role="presentation" width="100%">
                   <tr>
                     <td style="color:#ffffff; font-size:18px; font-weight:700; font-family: Georgia, serif;">
-                      StayByHour
+                      Natasha Hotels
                     </td>
                   </tr>
                 </table>
@@ -55,7 +55,7 @@ export const wrapEmail = ({ title, preheader = "", bodyHtml, ctaLabel, ctaUrl })
             <tr>
               <td style="padding: 20px 28px; border-top:1px solid ${BRAND.border};">
                 <p style="margin:0; color:${BRAND.muted}; font-size:12px;">
-                  StayByHour — hourly &amp; full-day hotel stays across India.<br />
+                  Natasha Hotels — hourly &amp; full-day hotel stays across India.<br />
                   Need help? Reply to this email or contact support@staybyhour.com
                 </p>
               </td>

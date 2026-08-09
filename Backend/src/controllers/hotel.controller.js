@@ -211,38 +211,67 @@ export const deleteHotel = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "Hotel deactivated"));
 });
 
-// POST /hotels/:id/images (multer, admin | owner) — uploads to Cloudinary when
-// CLOUDINARY_* env vars are set, otherwise falls back to local disk storage
-// under uploads/hotels (same graceful-degradation pattern as Razorpay/Firebase).
+// Saves one buffer to local disk under uploads/hotels and returns its URL —
+// the fallback path when Cloudinary isn't configured.
+const saveBufferLocally = (file) => {
+  fs.mkdirSync(uploadsRoot, { recursive: true });
+  const ext = path.extname(file.originalname) || (file.fieldname === "video" ? ".mp4" : ".jpg");
+  const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, "-");
+  const filename = `${base}-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
+  fs.writeFileSync(path.join(uploadsRoot, filename), file.buffer);
+  return `/uploads/hotels/${filename}`;
+};
+
+// POST /hotels/:id/images (multer .fields, admin | owner) — accepts up to 5
+// images and 1 video per request; uploads to Cloudinary when CLOUDINARY_*
+// env vars are set, otherwise falls back to local disk storage under
+// uploads/hotels (same graceful-degradation pattern as Razorpay/Firebase).
+// A hotel may only ever have 5 images total — new uploads are rejected once
+// that cap (counting images already on the hotel) would be exceeded. A new
+// video upload replaces any existing one (a hotel has at most one).
+const MAX_HOTEL_IMAGES = 5;
+
 export const uploadHotelImages = asyncHandler(async (req, res) => {
   const hotel = await Hotel.findById(req.params.id);
   if (!hotel) throw new ApiError(404, "Hotel not found");
   assertOwnerOrAdmin(hotel, req.user);
 
-  const files = req.files || [];
-  if (!files.length) throw new ApiError(400, "No images uploaded");
+  const imageFiles = req.files?.images || [];
+  const videoFile = req.files?.video?.[0] || null;
+  if (!imageFiles.length && !videoFile) throw new ApiError(400, "No images or video uploaded");
 
-  let urls;
-  if (isCloudinaryConfigured) {
-    const results = await Promise.all(
-      files.map((f) => uploadBufferToCloudinary(f.buffer, `staybyhour/hotels/${hotel.slug}`))
+  if (hotel.images.length + imageFiles.length > MAX_HOTEL_IMAGES) {
+    throw new ApiError(
+      400,
+      `A hotel can have at most ${MAX_HOTEL_IMAGES} images (${hotel.images.length} already uploaded, ${imageFiles.length} more requested)`
     );
-    urls = results.map((r) => r.secure_url);
-  } else {
-    fs.mkdirSync(uploadsRoot, { recursive: true });
-    urls = files.map((f) => {
-      const ext = path.extname(f.originalname) || ".jpg";
-      const base = path.basename(f.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, "-");
-      const filename = `${base}-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
-      fs.writeFileSync(path.join(uploadsRoot, filename), f.buffer);
-      return `/uploads/hotels/${filename}`;
-    });
   }
 
-  hotel.images.push(...urls);
+  if (imageFiles.length) {
+    let imageUrls;
+    if (isCloudinaryConfigured) {
+      const results = await Promise.all(
+        imageFiles.map((f) => uploadBufferToCloudinary(f.buffer, `staybyhour/hotels/${hotel.slug}`, "image"))
+      );
+      imageUrls = results.map((r) => r.secure_url);
+    } else {
+      imageUrls = imageFiles.map(saveBufferLocally);
+    }
+    hotel.images.push(...imageUrls);
+  }
+
+  if (videoFile) {
+    if (isCloudinaryConfigured) {
+      const result = await uploadBufferToCloudinary(videoFile.buffer, `staybyhour/hotels/${hotel.slug}`, "video");
+      hotel.video = result.secure_url;
+    } else {
+      hotel.video = saveBufferLocally(videoFile);
+    }
+  }
+
   await hotel.save();
 
-  res.status(200).json(new ApiResponse(200, { images: hotel.images }, "Images uploaded"));
+  res.status(200).json(new ApiResponse(200, { images: hotel.images, video: hotel.video }, "Media uploaded"));
 });
 
 // ---------- Rooms (nested under a hotel) ----------

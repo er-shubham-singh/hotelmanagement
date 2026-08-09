@@ -22,7 +22,7 @@ export const thankYouEmail = ({ name, bookingRef, hotelName, hotelSlug }) => {
     ctaUrl: `${config.clientUrl}/hotels/${hotelSlug}`,
   });
 
-  return { subject: `Thanks for staying with StayByHour!`, html };
+  return { subject: `Thanks for staying with Natasha Hotels!`, html };
 };
 
 export default thankYouEmail;

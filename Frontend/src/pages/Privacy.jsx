@@ -7,7 +7,7 @@ const Privacy = () => (
         booking-related communication. Phone numbers are verified via a one-time password (OTP) at signup.
       </p>
       <p>
-        Payment details are handled by third-party payment processors in production deployments; StayByHour does
+        Payment details are handled by third-party payment processors in production deployments; Natasha Hotels does
         not store raw card numbers. This demo environment uses a mock payment flow and processes no real
         transactions.
       </p>

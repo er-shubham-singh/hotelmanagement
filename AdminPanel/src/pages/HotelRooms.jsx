@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { ArrowLeft, Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Upload, Film } from "lucide-react";
 import Loader from "../common/Loader.jsx";
 import Button from "../common/Button.jsx";
 import Input from "../common/Input.jsx";
@@ -17,9 +17,11 @@ const HotelRooms = () => {
   const { slug } = useParams();
   const queryClient = useQueryClient();
   const fileInputRef = useRef(null);
+  const videoInputRef = useRef(null);
   const [editingRoom, setEditingRoom] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm();
 
   const { data, isLoading } = useQuery({
@@ -87,9 +89,24 @@ const HotelRooms = () => {
     refresh();
   };
 
+  const MAX_IMAGES = 5;
+
   const handleImageUpload = async (e) => {
     const files = e.target.files;
     if (!files?.length) return;
+
+    const remaining = MAX_IMAGES - (data.hotel.images?.length || 0);
+    if (remaining <= 0) {
+      toast.error(`This hotel already has the maximum of ${MAX_IMAGES} images`);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    if (files.length > remaining) {
+      toast.error(`Only ${remaining} more image(s) can be added (max ${MAX_IMAGES} total)`);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     const formData = new FormData();
     Array.from(files).forEach((f) => formData.append("images", f));
     setIsUploading(true);
@@ -102,6 +119,24 @@ const HotelRooms = () => {
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleVideoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("video", file);
+    setIsUploadingVideo(true);
+    try {
+      await uploadHotelImages(data.hotel._id, formData);
+      toast.success(data.hotel.video ? "Video replaced" : "Video uploaded");
+      refresh();
+    } catch (error) {
+      // handled by interceptor
+    } finally {
+      setIsUploadingVideo(false);
+      if (videoInputRef.current) videoInputRef.current.value = "";
     }
   };
 
@@ -120,10 +155,19 @@ const HotelRooms = () => {
             <h2 className="font-heading text-lg font-semibold text-text">{data.hotel.name}</h2>
             <p className="text-sm text-text-muted">{data.hotel.area}, {data.hotel.city?.name}</p>
           </div>
-          <div>
+          <div className="flex flex-shrink-0 gap-2">
             <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleImageUpload} />
-            <Button variant="outline" isLoading={isUploading} onClick={() => fileInputRef.current?.click()}>
-              <Upload className="h-4 w-4" /> Upload Images
+            <Button
+              variant="outline"
+              isLoading={isUploading}
+              disabled={(data.hotel.images?.length || 0) >= MAX_IMAGES}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="h-4 w-4" /> Upload Images ({data.hotel.images?.length || 0}/{MAX_IMAGES})
+            </Button>
+            <input ref={videoInputRef} type="file" accept="video/mp4,video/webm,video/quicktime" hidden onChange={handleVideoUpload} />
+            <Button variant="outline" isLoading={isUploadingVideo} onClick={() => videoInputRef.current?.click()}>
+              <Film className="h-4 w-4" /> {data.hotel.video ? "Replace Video" : "Upload Video"}
             </Button>
           </div>
         </div>
@@ -137,6 +181,16 @@ const HotelRooms = () => {
                 className="h-20 w-28 flex-shrink-0 rounded-lg object-cover"
               />
             ))}
+          </div>
+        )}
+        {data.hotel.video && (
+          <div className="mt-4">
+            <p className="mb-1.5 text-xs font-medium text-text-muted">Hotel walkthrough video</p>
+            <video
+              src={data.hotel.video.startsWith("http") ? data.hotel.video : `${env.apiBaseUrl.replace("/api/v1", "")}${data.hotel.video}`}
+              controls
+              className="h-40 max-w-xs rounded-lg bg-black"
+            />
           </div>
         )}
       </div>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Clock, Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 import { CITY_CHIPS } from "../utils/constants.js";
 import { env } from "../config/env.js";
 
@@ -29,9 +29,7 @@ const Footer = () => (
     <div className="container-app grid gap-10 py-10 md:grid-cols-[2fr_1fr_1fr_1.5fr]">
       <div>
         <Link to="/" className="mb-4 flex items-center gap-2 font-heading text-xl font-bold text-text">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white">
-            <Clock className="h-5 w-5" />
-          </span>
+          <img src="/logo.png" alt={env.appName} className="h-9 w-9 object-contain" />
           {env.appName}
         </Link>
         <p className="max-w-sm text-sm text-text-muted">

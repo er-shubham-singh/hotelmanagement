@@ -108,7 +108,7 @@ export const createBookingQr = asyncHandler(async (req, res) => {
 
   const { linkId, url, qrDataUrl, mock } = await createPaymentLinkWithQr({
     amountRupees: booking.priceBreakdown.payable,
-    description: `StayByHour booking ${booking.bookingRef}`,
+    description: `Natasha Hotels booking ${booking.bookingRef}`,
     referenceId: booking.bookingRef,
     notes: { bookingId: String(booking._id), purpose: "booking" },
   });

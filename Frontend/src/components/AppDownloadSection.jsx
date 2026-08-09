@@ -3,7 +3,7 @@ import { Smartphone } from "lucide-react";
 const AppDownloadSection = () => (
   <div className="grid items-center gap-8 rounded-2xl bg-primary p-8 text-white sm:grid-cols-2 sm:p-12">
     <div>
-      <h3 className="font-heading text-2xl font-bold sm:text-3xl">Book faster with the StayByHour app</h3>
+      <h3 className="font-heading text-2xl font-bold sm:text-3xl">Book faster with the Natasha Hotels app</h3>
       <p className="mt-3 text-white/85">
         Get exclusive app-only offers, manage bookings on the go, and check in with a tap. Available soon on
         iOS and Android.

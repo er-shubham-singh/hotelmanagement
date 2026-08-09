@@ -29,7 +29,7 @@ export const config = {
     user: process.env.SMTP_USER || "",
     pass: process.env.SMTP_PASS || "",
   },
-  mailFrom: process.env.MAIL_FROM || "StayByHour <no-reply@staybyhour.com>",
+  mailFrom: process.env.MAIL_FROM || "Natasha Hotels <no-reply@staybyhour.com>",
   razorpay: {
     keyId: process.env.RAZORPAY_KEY_ID || "",
     keySecret: process.env.RAZORPAY_KEY_SECRET || "",

@@ -15,6 +15,7 @@ const hotelSchema = new mongoose.Schema(
     },
     description: { type: String, default: "" },
     images: [{ type: String }],
+    video: { type: String, default: null },
     amenities: [{ type: String }], // e.g. wifi, ac, tv, water, parking, breakfast
     tags: [{ type: String, enum: Object.values(HOTEL_TAGS) }],
     starCategory: { type: Number, min: 1, max: 5, default: 3 },

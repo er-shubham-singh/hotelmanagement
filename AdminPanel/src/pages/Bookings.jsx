@@ -225,7 +225,7 @@ const Bookings = () => {
             onChange={(e) => setRefundAmount(e.target.value)}
             placeholder="e.g. 500"
           />
-          <p className="text-xs text-text-muted">Credited directly to the guest's StayByHour wallet.</p>
+          <p className="text-xs text-text-muted">Credited directly to the guest's Natasha Hotels wallet.</p>
           <Button className="w-full" onClick={submitRefund}>
             Issue Refund
           </Button>

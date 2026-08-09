@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Building2, MapPin, Tag, CalendarCheck, Users, Inbox, Clock, History, X } from "lucide-react";
+import { LayoutDashboard, Building2, MapPin, Tag, CalendarCheck, Users, Inbox, History, X } from "lucide-react";
 import { useAuth } from "../hooks/useAuth.js";
 
 const links = [
@@ -58,10 +58,8 @@ const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
       >
         <div className="flex h-16 items-center justify-between gap-2 border-b border-border px-5 font-heading text-lg font-bold text-text">
           <div className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white">
-              <Clock className="h-5 w-5" />
-            </span>
-            StayByHour
+            <img src="/logo.png" alt="Natasha Hotels" className="h-9 w-9 object-contain" />
+            Natasha Hotels
             <span className="badge">Admin</span>
           </div>
           <button onClick={onClose} aria-label="Close menu" className="rounded-lg p-1.5 text-text-muted hover:bg-surface-muted md:hidden">

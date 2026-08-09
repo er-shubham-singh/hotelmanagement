@@ -15,7 +15,7 @@ const start = async () => {
 
   httpServer.listen(config.port, () => {
     // eslint-disable-next-line no-console
-    console.log(`[server] StayByHour API running on http://localhost:${config.port} (${config.nodeEnv})`);
+    console.log(`[server] Natasha Hotels API running on http://localhost:${config.port} (${config.nodeEnv})`);
   });
 };
 

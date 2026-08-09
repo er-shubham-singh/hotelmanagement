@@ -24,7 +24,7 @@ const Partner = () => {
         <Building2 className="mx-auto h-10 w-10 text-primary" />
         <h1 className="mt-3 font-heading text-2xl font-bold text-text sm:text-3xl">List Your Hotel</h1>
         <p className="mt-2 text-text-muted">
-          Partner with StayByHour and reach guests looking for flexible hourly and day-use stays.
+          Partner with Natasha Hotels and reach guests looking for flexible hourly and day-use stays.
         </p>
       </div>
 

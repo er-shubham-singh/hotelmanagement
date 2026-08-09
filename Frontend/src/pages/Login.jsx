@@ -99,7 +99,7 @@ const Login = () => {
     setIsSubmitting(true);
     try {
       await loginWithOtp(phone, code, name, referralCode);
-      toast.success("Welcome to StayByHour!");
+      toast.success("Welcome to Natasha Hotels!");
       navigate(redirectTo, { replace: true });
     } catch (error) {
       // handled by interceptor
@@ -112,7 +112,7 @@ const Login = () => {
     setIsGoogleLoading(true);
     try {
       await loginWithGoogle();
-      toast.success("Welcome to StayByHour!");
+      toast.success("Welcome to Natasha Hotels!");
       navigate(redirectTo, { replace: true });
     } catch (error) {
       toast.error(error.message || "Google sign-in failed — please try again");
@@ -192,7 +192,7 @@ const Login = () => {
     setIsSubmitting(true);
     try {
       await registerWithEmailOtp({ name: signupName, email: signupEmail, password, referralCode });
-      toast.success("Account created — welcome to StayByHour!");
+      toast.success("Account created — welcome to Natasha Hotels!");
       navigate(redirectTo, { replace: true });
     } catch (error) {
       // handled by interceptor

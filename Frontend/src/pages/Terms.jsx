@@ -3,7 +3,7 @@ const Terms = () => (
     <h1 className="font-heading text-3xl font-bold text-text">Terms & Conditions</h1>
     <div className="prose-content mt-6 space-y-4 text-text-muted">
       <p>
-        By using StayByHour, you agree to book stays only for lawful purposes and to provide accurate guest
+        By using Natasha Hotels, you agree to book stays only for lawful purposes and to provide accurate guest
         details, including valid government-issued identification at check-in.
       </p>
       <p>
@@ -16,7 +16,7 @@ const Terms = () => (
         visible on the hotel detail page before booking.
       </p>
       <p>
-        StayByHour acts as a booking intermediary between guests and partner hotels; check-in conduct, room
+        Natasha Hotels acts as a booking intermediary between guests and partner hotels; check-in conduct, room
         condition, and on-site policies are the responsibility of the respective hotel.
       </p>
     </div>

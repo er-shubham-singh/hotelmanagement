@@ -3,9 +3,9 @@ import { Clock3, ShieldCheck, Users2 } from "lucide-react";
 const About = () => (
   <div className="container-app py-6 sm:py-10">
     <div className="mx-auto max-w-2xl text-center">
-      <h1 className="font-heading text-3xl font-bold text-text">About StayByHour</h1>
+      <h1 className="font-heading text-3xl font-bold text-text">About Natasha Hotels</h1>
       <p className="mt-4 text-text-muted">
-        StayByHour started with a simple idea: not every trip needs a full night's stay. Whether it's a layover,
+        Natasha Hotels started with a simple idea: not every trip needs a full night's stay. Whether it's a layover,
         a business meeting, or a few hours to freshen up between trains, we help travelers find a clean,
         comfortable room for exactly the time they need — nothing more, nothing less.
       </p>

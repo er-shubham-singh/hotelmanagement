@@ -15,7 +15,7 @@ import paymentRoutes from "./payment.routes.js";
 const router = Router();
 
 router.get("/health", (req, res) => {
-  res.status(200).json(new ApiResponse(200, { uptime: process.uptime() }, "StayByHour API is healthy"));
+  res.status(200).json(new ApiResponse(200, { uptime: process.uptime() }, "Natasha Hotels API is healthy"));
 });
 
 router.use("/auth", authRoutes);

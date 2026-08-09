@@ -126,7 +126,7 @@ const HotelDetail = () => {
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <ImageCarousel images={hotel.images} alt={hotel.name} aspect="aspect-[16/9]" />
+          <ImageCarousel images={hotel.images} video={hotel.video} alt={hotel.name} aspect="aspect-[16/9]" />
 
           <div className="mt-6 flex flex-wrap gap-2">
             {hotel.tags?.map((tag) => <Badge key={tag}>{HOTEL_TAG_LABELS[tag] || tag}</Badge>)}
