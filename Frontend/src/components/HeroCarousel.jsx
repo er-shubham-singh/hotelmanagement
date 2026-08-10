@@ -69,7 +69,7 @@ const HeroCarousel = ({ children }) => {
           }`}
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary-hover/80 via-primary-hover/60 to-bg backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-gradient-to-b from-primary-hover/35 via-black/20 to-bg" />
 
       <div className="container-app relative">
         <div key={index} className="mx-auto mb-6 max-w-2xl text-center">
@@ -88,27 +88,35 @@ const HeroCarousel = ({ children }) => {
 
         {children}
 
-        <div className="mt-6 flex items-center justify-center gap-2">
+        <div className="mt-6 flex items-center justify-center gap-3">
           {SLIDES.map((_, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setIndex(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className="relative h-1.5 w-8 overflow-hidden rounded-full bg-white/30"
+              className="relative flex h-7 w-7 items-center justify-center"
             >
-              <span
-                className={`absolute inset-0 rounded-full bg-accent ${
-                  i < index ? "" : i > index ? "scale-x-0" : "animate-dot-fill"
-                }`}
-                style={
-                  i === index
-                    ? { animationDuration: `${SLIDE_DURATION_MS}ms`, animationPlayState: isPaused ? "paused" : "running" }
-                    : i < index
-                      ? { transform: "scaleX(1)", transformOrigin: "left" }
-                      : { transformOrigin: "left" }
-                }
-              />
+              <svg viewBox="0 0 26 26" className="h-7 w-7 -rotate-90">
+                <circle cx="13" cy="13" r="10" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2" />
+                {i < index && (
+                  <circle cx="13" cy="13" r="10" fill="none" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" />
+                )}
+                {i === index && (
+                  <circle
+                    cx="13"
+                    cy="13"
+                    r="10"
+                    fill="none"
+                    stroke="var(--color-accent)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    className="animate-dot-ring"
+                    style={{ animationDuration: `${SLIDE_DURATION_MS}ms`, animationPlayState: isPaused ? "paused" : "running" }}
+                  />
+                )}
+              </svg>
+              <span className={`absolute h-1.5 w-1.5 rounded-full ${i <= index ? "bg-accent" : "bg-white/70"}`} />
             </button>
           ))}
         </div>

@@ -90,12 +90,13 @@
   }
 }
 
-@keyframes dot-fill {
+/* Circumference of the r=10 progress ring used by the hero carousel dots (2 * PI * 10). */
+@keyframes dot-ring-fill {
   from {
-    transform: scaleX(0);
+    stroke-dashoffset: 62.83;
   }
   to {
-    transform: scaleX(1);
+    stroke-dashoffset: 0;
   }
 }
 
@@ -103,9 +104,9 @@
   animation: fade-slide-up 0.7s ease-out both;
 }
 
-.animate-dot-fill {
-  animation-name: dot-fill;
+.animate-dot-ring {
+  stroke-dasharray: 62.83;
+  animation-name: dot-ring-fill;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
-  transform-origin: left;
 }
