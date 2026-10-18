@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Tag, Wallet, ShieldCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -215,6 +215,17 @@ const Booking = () => {
           <Button type="submit" variant="accent" className="w-full" isLoading={isSubmitting} disabled={!pricing}>
             {pricing?.payable === 0 ? "Confirm Booking" : `Continue to Payment · ${pricing ? formatCurrency(pricing.payable) : ""}`}
           </Button>
+          <p className="mt-2 text-center text-xs text-text-muted">
+            By proceeding, you agree to our{" "}
+            <Link to="/terms" target="_blank" className="text-primary hover:underline">
+              Terms
+            </Link>{" "}
+            &amp;{" "}
+            <Link to="/cancellation-policy" target="_blank" className="text-primary hover:underline">
+              Cancellation Policy
+            </Link>
+            .
+          </p>
         </form>
 
         <div>

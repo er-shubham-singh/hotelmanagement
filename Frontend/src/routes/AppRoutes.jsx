@@ -15,6 +15,7 @@ import Contact from "../pages/Contact.jsx";
 import Faqs from "../pages/Faqs.jsx";
 import Terms from "../pages/Terms.jsx";
 import Privacy from "../pages/Privacy.jsx";
+import CancellationPolicy from "../pages/CancellationPolicy.jsx";
 import Careers from "../pages/Careers.jsx";
 import AllCities from "../pages/AllCities.jsx";
 import NotFound from "../pages/NotFound.jsx";
@@ -38,6 +39,9 @@ const AppRoutes = () => (
       <Route path="faqs" element={<Faqs />} />
       <Route path="terms" element={<Terms />} />
       <Route path="privacy" element={<Privacy />} />
+      <Route path="cancellation-policy" element={<CancellationPolicy />} />
+      <Route path="cancellation-refund-policy" element={<CancellationPolicy />} />
+      <Route path="refund-policy" element={<CancellationPolicy />} />
       <Route path="careers" element={<Careers />} />
       <Route path="all-cities" element={<AllCities />} />
 

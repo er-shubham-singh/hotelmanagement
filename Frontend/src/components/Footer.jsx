@@ -18,6 +18,7 @@ const columns = [
     links: [
       { to: "/faqs", label: "FAQs" },
       { to: "/terms", label: "Terms & Conditions" },
+      { to: "/cancellation-policy", label: "Cancellation & Refund" },
       { to: "/privacy", label: "Privacy Policy" },
       { to: "/offers", label: "Offers" },
     ],
