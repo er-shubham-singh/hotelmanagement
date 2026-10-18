@@ -23,7 +23,6 @@
     "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
-    "@rolldown/binding-win32-x64-msvc": "^1.1.5",
     "@vitejs/plugin-react": "^6.0.3",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
